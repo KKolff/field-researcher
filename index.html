@@ -1,0 +1,849 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Transect: Field Notebook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@600;700&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --ground:#EEF1EA; --surface:#F8FAF5; --ink:#1C2620; --muted:#5B6A5F; --line:#CCD5C8;
+  --chip:#E1E8DC; --tape:#E0512A; --tape-ink:#FFFFFF; --good:#2F7D4F; --bad:#B23A2A;
+  --display:"Zilla Slab", Rockwell, "Roboto Slab", Georgia, serif;
+  --body:"Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#121813; --surface:#1A221C; --ink:#E3EAE1; --muted:#96A596; --line:#2D3A30;
+    --chip:#223026; --tape:#F0663F; --good:#5DBB82; --bad:#E07262;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#121813; --surface:#1A221C; --ink:#E3EAE1; --muted:#96A596; --line:#2D3A30;
+  --chip:#223026; --tape:#F0663F; --good:#5DBB82; --bad:#E07262;
+}
+html,body{height:100%}
+body{background:var(--ground);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45}
+.app{height:100%;display:grid;grid-template-rows:auto 1fr;box-sizing:border-box}
+header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:10px;padding-inline:16px;border-bottom:1px solid var(--line)}
+.brand{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:.01em;display:flex;align-items:baseline;gap:8px}
+.brand .tape{display:inline-block;width:18px;height:8px;background:var(--tape);transform:translateY(-3px) skewX(-18deg)}
+.meta{margin-left:auto;display:flex;gap:14px;font-family:var(--mono);font-size:12px;color:var(--muted);flex-wrap:wrap}
+.meta b{color:var(--ink);font-weight:600}
+.main{display:grid;grid-template-columns:1fr 390px;min-height:0}
+.mapwrap{position:relative;min-height:0;overflow:hidden;background:#20331f}
+canvas{display:block;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.overlay{position:absolute;display:flex;gap:8px;align-items:center}
+.ov-bl{left:12px;bottom:12px;font-size:12px;color:#EEF3E8;background:rgba(15,24,17,.72);padding:6px 10px;border-radius:4px;max-width:calc(100% - 300px)}
+.ov-br{right:12px;bottom:12px}
+.ov-tl{left:12px;top:12px;font-family:var(--mono);font-size:11px;color:#EEF3E8;background:rgba(15,24,17,.72);padding:5px 8px;border-radius:4px}
+button{font:inherit;cursor:pointer}
+.btn{border:0;border-radius:4px;padding:10px 14px;font-weight:700;font-size:14px;background:var(--tape);color:var(--tape-ink);letter-spacing:.01em}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.map{background:rgba(15,24,17,.82);color:#F3F6EF;border:1px solid rgba(255,255,255,.25)}
+.btn:focus-visible,.tab:focus-visible,.opt:focus-visible,summary:focus-visible{outline:2px solid var(--tape);outline-offset:2px}
+aside{border-left:1px solid var(--line);background:var(--surface);display:grid;grid-template-rows:auto 1fr;min-height:0}
+.tabs{display:flex;border-bottom:1px solid var(--line)}
+.tab{flex:1;background:none;border:0;padding:12px 8px;font-weight:600;color:var(--muted);border-bottom:3px solid transparent;font-size:14px}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--tape)}
+.pane{overflow-y:auto;padding-block:16px;padding-inline:18px}
+.eyebrow{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+h2{font-family:var(--display);font-weight:700;font-size:24px;line-height:1.15;margin:4px 0 6px;text-wrap:balance}
+h3{font-family:var(--display);font-weight:600;font-size:18px;margin:0}
+p{margin:0 0 10px}
+.muted{color:var(--muted)}
+.stack{display:flex;flex-direction:column;gap:14px}
+.plate{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;padding:12px;border:1px solid var(--line);border-radius:6px;background:var(--ground)}
+.badge{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-weight:600;font-size:16px;border:2px solid rgba(255,255,255,.85);box-shadow:0 0 0 1px var(--line)}
+.portrait{border-radius:50%;overflow:hidden;flex:none;box-shadow:0 0 0 2px var(--surface),0 0 0 3px var(--line)}
+.portrait svg{display:block;width:100%;height:100%}
+.portrait.s{width:28px;height:28px}
+.portrait.m{width:64px;height:64px}
+.portrait.xl{width:100%;max-width:220px;aspect-ratio:1;height:auto;margin-inline:auto;border-radius:10px;box-shadow:0 0 0 1px var(--line);animation:reveal .5s ease both}
+@keyframes reveal{from{transform:scale(.92);opacity:.3}to{transform:none;opacity:1}}
+.sci{font-style:italic;color:var(--muted);font-size:14px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-family:var(--mono);font-size:12px}
+.cues{display:flex;flex-direction:column;gap:8px;border-left:3px solid var(--tape);padding-left:12px}
+.cue{animation:in .45s ease both}
+@keyframes in{from{opacity:.0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.bar{height:4px;background:var(--chip);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--tape);width:0}
+.opts{display:grid;gap:8px}
+.opt{display:grid;grid-template-columns:48px 1fr;gap:10px;align-items:center;text-align:left;padding:10px 12px;border:1px solid var(--line);border-radius:5px;background:var(--surface);color:var(--ink)}
+.opt:hover{border-color:var(--tape)}
+.opt code,.code{font-family:var(--mono);font-weight:600;font-size:13px}
+.opt.right{border-color:var(--good);box-shadow:inset 3px 0 0 var(--good)}
+.opt.wrong{border-color:var(--bad);box-shadow:inset 3px 0 0 var(--bad)}
+.verdict{font-weight:700}
+.verdict.good{color:var(--good)} .verdict.bad{color:var(--bad)}
+.note{background:var(--chip);padding:10px 12px;border-radius:5px;font-size:14px}
+.entries{display:flex;flex-direction:column}
+.entry{display:grid;grid-template-columns:46px 1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);align-items:start}
+.entry .t{font-family:var(--mono);font-size:12px;color:var(--muted);padding-top:2px;font-variant-numeric:tabular-nums}
+.entry .what{font-size:14px}
+.entry .sub{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.pill{font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap}
+.pill.ok{background:color-mix(in srgb,var(--good) 18%,transparent);color:var(--good)}
+.pill.fix{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}
+.prog{display:grid;gap:8px}
+.progrow{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:center}
+.dot{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-size:10px;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{font-family:var(--mono);font-size:11px;padding:2px 6px;border-radius:3px;background:var(--chip);color:var(--muted)}
+.chip.on{background:var(--ink);color:var(--surface)}
+details{border-bottom:1px solid var(--line);padding-block:10px}
+summary{cursor:pointer;list-style:none;display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center}
+summary::-webkit-details-marker{display:none}
+.beh{display:grid;grid-template-columns:48px 1fr;gap:10px;padding-top:10px;font-size:14px}
+.beh b{display:block}
+.empty{padding:18px;border:1px dashed var(--line);border-radius:6px;color:var(--muted);text-align:center}
+.small{font-size:13px}
+.scene{width:100%;aspect-ratio:16/9;max-width:100%;border-radius:8px;overflow:hidden;box-shadow:0 0 0 1px var(--line)}
+.scene svg{display:block;width:100%;height:100%}
+.timer{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;color:var(--ink)}
+.toast{position:absolute;left:50%;top:44px;transform:translateX(-50%);background:rgba(15,24,17,.92);color:#F3F6EF;padding:9px 14px;border-radius:6px;font-size:13px;max-width:min(420px,86%);text-align:center;box-shadow:0 4px 16px rgba(0,0,0,.25);z-index:3}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--ground);border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-size:12px;color:var(--muted)}
+.stat b{display:block;font-family:var(--display);font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.bdg{display:flex;gap:8px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:6px;font-size:12px;line-height:1.3;background:var(--surface)}
+.bdg.locked{opacity:.5;filter:grayscale(1)}
+.bdg .ico{width:30px;height:30px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--chip);font-family:var(--mono);font-weight:700;font-size:11px;color:var(--ink)}
+.bdg b{display:block;font-size:12.5px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:5px;overflow:hidden;vertical-align:middle}
+.seg button{border:0;background:transparent;padding:3px 9px;font-size:12px;color:var(--muted);font-family:var(--mono)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+.seg button:focus-visible{outline:2px solid var(--tape);outline-offset:-2px}
+.helpbtn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:5px;padding:3px 10px;font-size:12px;font-weight:600}
+.helpbtn:focus-visible{outline:2px solid var(--tape);outline-offset:2px}
+.tut-block{position:fixed;inset:0;z-index:50}
+.tut-hole{position:fixed;z-index:51;border-radius:12px;box-shadow:0 0 0 9999px rgba(10,16,12,.64);outline:2px solid var(--tape);outline-offset:2px;pointer-events:none;transition:top .25s,left .25s,width .25s,height .25s,border-radius .25s}
+.tut-card{position:fixed;z-index:52;width:min(340px,calc(100vw - 32px));background:var(--surface);color:var(--ink);border-radius:10px;padding:16px 18px;box-shadow:0 12px 40px rgba(0,0,0,.35);transition:top .25s,left .25s}
+.tut-card h3{font-size:20px;margin:2px 0 6px;text-wrap:balance}
+.tut-card p{font-size:14px;margin:0 0 12px}
+.tut-foot{display:flex;align-items:center;gap:8px}
+.tut-foot .sp{flex:1}
+.tut-dots{display:flex;gap:4px}
+.tut-dots i{width:6px;height:6px;border-radius:50%;background:var(--line)}
+.tut-dots i.on{background:var(--tape)}
+.tut-skip{background:none;border:0;color:var(--muted);font-size:13px;padding:6px 4px;text-decoration:underline}
+@media (prefers-reduced-motion:reduce){.tut-hole,.tut-card{transition:none}}
+@media (max-width:820px){
+  .main{grid-template-columns:1fr;grid-template-rows:52% 48%}
+  aside{border-left:0;border-top:1px solid var(--line)}
+  .brand{font-size:19px}
+  .meta{gap:10px}
+  .ov-bl{max-width:calc(100% - 180px);font-size:11px}
+}
+@media (prefers-reduced-motion:reduce){.cue,.portrait.xl{animation:none}}
+</style>
+</head>
+<body style="margin:0">
+
+
+<div class="app">
+  <header>
+    <div class="brand"><span class="tape" aria-hidden="true"></span>Transect</div>
+    <div class="meta">
+      <span>Observer <b>OBS-01</b></span>
+      <span>Grid <b id="gridref">—</b></span>
+      <span>Ethogram <b id="ethoCount">0 / 19</b></span>
+      <span>Score <b id="scoreVal">0</b></span>
+      <span><button class="helpbtn" id="helpBtn">How to play</button></span>
+      <span>Move <span class="seg" role="group" aria-label="Movement mode"><button id="modeTap" aria-pressed="true">Tap</button><button id="modeGps" aria-pressed="false">GPS</button></span></span>
+    </div>
+  </header>
+  <div class="main">
+    <div class="mapwrap" id="mapwrap">
+      <canvas id="map" aria-label="Field site map. Tap or click to walk; arrow keys also move you."></canvas>
+      <div class="overlay ov-tl" id="zoneLabel">North bank forest</div>
+      <div class="overlay ov-bl" id="moveHint">Tap the map to walk (or use arrow keys). Stop about 40 m away: closer and the animals move off.</div>
+      <div class="toast" id="toast" hidden></div>
+      <div class="overlay ov-br"><button class="btn map" id="scanBtn">Scan with binoculars</button></div>
+    </div>
+    <aside>
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" id="tab-field" aria-selected="true">Field</button>
+        <button class="tab" role="tab" id="tab-notes" aria-selected="false">Notebook <span id="logCount"></span></button>
+        <button class="tab" role="tab" id="tab-guide" aria-selected="false">Ethogram</button>
+      </div>
+      <div class="pane" id="pane"></div>
+    </aside>
+  </div>
+</div>
+
+<script>
+(() => {
+/* ---------- Species & ethogram ---------- */
+const SPECIES = {
+  PT:{name:"Chimpanzee",sci:"Pan troglodytes",fill:"#C98A4B",bg:"#EAD5B8",text:"#1C140C",zones:["north"],
+    marks:"Dark grey face with a slightly paler muzzle, large ears standing out from the head, heavy brow ridge, black coat.",
+    habitat:"North bank forest",
+    behs:[
+      {code:"GRM",name:"Allogrooming",def:"Uses fingers or lips to part and clean another individual's hair.",
+       cue:["Two adults sit close together at the base of a fig tree.","One parts the other's hair with its fingers and picks at the skin, bringing something to its lips.","The receiver lies still, eyes half-closed, one arm raised."],
+       note:"Grooming builds and repairs social bonds. In some communities pairs clasp hands overhead while grooming, a habit that differs from group to group."},
+      {code:"RST",name:"Resting (sitting)",def:"Stationary, seated or lying; not feeding, travelling or interacting.",
+       cue:["An adult sits with its back against a buttress root.","Its arms rest on its knees; it isn't eating or handling anything.","Now and then it looks around, then settles again."],
+       note:"Resting fills a large share of a wild chimpanzee's day, especially in the midday heat. Logging it is essential for activity budgets."},
+      {code:"TLU",name:"Tool use: termite fishing",def:"Inserts a prepared stem or grass blade into a termite mound to extract insects.",
+       cue:["A female crouches beside a termite mound.","She strips the leaves off a thin stem, then pushes it into a hole in the mound.","She draws it out slowly and eats what clings to it."],
+       note:"The stem is modified before use, so this counts as tool making as well as tool use."},
+      {code:"PHT",name:"Pant-hoot",def:"Loud call building from soft hoots to a screaming climax.",
+       cue:["Soft, breathy hoots begin, getting faster and louder.","They build to a climax of screams as the caller pounds a buttress root.","Seconds later, a distant party answers."],
+       note:"Pant-hoots carry over a kilometre and help community members find each other."}
+    ]},
+  PP:{name:"Bonobo",sci:"Pan paniscus",fill:"#A98BE0",bg:"#DCD0F0",text:"#1B1330",zones:["south"],
+    marks:"Black, heavily wrinkled face with a paler lower lip, rounder head, hair parted in the middle, slimmer build than a chimpanzee.",
+    habitat:"South bank forest",
+    behs:[
+      {code:"FSH",name:"Food sharing",def:"Food passes from one individual to another, tolerated by the holder.",
+       cue:["An adult female holds a large fruit.","Another bonobo sits facing her, one hand held out, palm up.","She lets it take a piece and carries on eating."],
+       note:"Bonobos are unusually tolerant around food; experiments have found they will even share with unfamiliar bonobos."},
+      {code:"GRM",name:"Allogrooming",def:"Uses fingers or lips to part and clean another individual's hair.",
+       cue:["Three bonobos lie together on a fallen trunk.","One combs through another's back hair with its fingers, picking and lip-smacking.","The groomed individual shifts to offer its shoulder."],
+       note:"Female bonobos form strong grooming bonds, which underpin their collective influence over males."},
+      {code:"PLY",name:"Social play",def:"Chasing, wrestling or tickling with a relaxed play face; no injury.",
+       cue:["Two juveniles chase each other around a tree trunk.","They tumble and wrestle, mouths open wide, lower teeth showing.","You hear rhythmic panting, like breathless laughter."],
+       note:"The open-mouth play face and panting laughter signal that rough contact isn't aggression. Adult bonobos keep playing far more than most apes."},
+      {code:"BIP",name:"Bipedal carrying",def:"Walks upright on the hind limbs, usually while carrying objects.",
+       cue:["An adult steps into a clearing on two legs.","Both arms are full of stems pulled from a swampy patch.","It walks several metres upright before dropping onto all fours."],
+       note:"Apes walk on two legs most often when their hands are full, an observation used in thinking about the origins of human bipedalism."},
+      {code:"NST",name:"Nest building",def:"Bends and weaves branches into a sleeping platform.",
+       cue:["Late afternoon: an adult climbs into a tree fork.","It bends branches inward, pressing and weaving them under its feet.","It lies down on the platform and tucks a few leafy twigs under its head."],
+       note:"Great apes build a fresh nest almost every night, so nest counts are a standard way to survey populations."}
+    ]},
+  CJ:{name:"Common marmoset",sci:"Callithrix jacchus",fill:"#EACB5A",bg:"#F1E3A8",text:"#2A2408",zones:["plot"],
+    marks:"Tiny; white ear tufts, white blaze on the forehead, amber eyes, grey-white-brown banded coat and ringed tail.",
+    habitat:"West gallery plot",
+    behs:[
+      {code:"GUG",name:"Tree gouging",def:"Bites into bark with the lower incisors to make gum flow.",
+       cue:["A small primate clings vertically to a trunk, tail hanging down.","It anchors its upper teeth and scrapes hard into the bark with its lower teeth.","The trunk around it is pocked with small oval holes, some glistening."],
+       note:"Chisel-like lower incisors let marmosets feed on tree gum, a food few other primates can reach."},
+      {code:"SCM",name:"Scent marking",def:"Rubs anogenital or chest glands against a surface.",
+       cue:["A marmoset walks along a branch, then presses its rear down against the bark.","It drags itself forward a short way, leaving a damp trace.","It moves on and repeats this on the next branch."],
+       note:"Scent marks carry information about identity and reproductive state, and cluster where the group spends most time."},
+      {code:"INC",name:"Infant carrying",def:"Carries one or more dependent infants.",
+       cue:["An adult moves through the vines with two tiny infants clinging to its back.","It pauses beside a younger group member.","The infants scramble across onto the second animal's back."],
+       note:"Marmosets usually have twins, and fathers and older siblings do much of the carrying. This is cooperative breeding."},
+      {code:"PHE",name:"Phee call",def:"Long, tonal, whistle-like contact call.",
+       cue:["A marmoset sits still on a branch, looking around.","It gives a long, high whistle, then repeats it.","From out of sight, another marmoset answers in the same tone."],
+       note:"Marmosets take turns in phee exchanges, waiting for a reply before calling again."},
+      {code:"GRM",name:"Allogrooming",def:"Picks through another individual's fur with hands or teeth.",
+       cue:["Two marmosets sit pressed together on a horizontal branch.","One picks through the other's fur with its hands and teeth.","After a while they swap roles."],
+       note:"Marmoset grooming is often returned within the same bout."}
+    ]},
+  CA:{name:"Sooty mangabey",sci:"Cercocebus atys",fill:"#6FC3B8",bg:"#CBE7E2",text:"#0E2522",zones:["north","south"],
+    marks:"Uniform smoky grey coat, dark grey face with a short muzzle and conspicuous pale eyelids.",
+    habitat:"Forest floor, both banks",
+    behs:[
+      {code:"FGR",name:"Ground foraging",def:"Searches leaf litter or soil for food while moving slowly.",
+       cue:["A group moves slowly across the forest floor.","One turns over leaves and sticks with its hands, checking beneath each.","Its tail is held up and curled forward over its back."],
+       note:"Sooty mangabeys spend much of their day on the ground, more than most forest monkeys."},
+      {code:"NUT",name:"Nut cracking (teeth)",def:"Breaks hard-shelled nuts with the molars.",
+       cue:["A mangabey picks up a hard, wrinkled nut from the ground.","It shifts it to the back of its mouth and bites down, straining.","With a loud crack the shell splits, and it picks out the seed."],
+       note:"Sooty mangabeys crack nuts with their teeth that chimpanzees in the same forests open with stone hammers."},
+      {code:"LPS",name:"Lip-smacking",def:"Rapid opening and closing of the lips toward another individual.",
+       cue:["A young mangabey approaches an adult female.","It faces her and rapidly opens and closes its lips, making soft smacking sounds.","She relaxes and lets it sit beside her."],
+       note:"Lip-smacking is a friendly signal that often comes before grooming; its rhythm resembles human speech."},
+      {code:"EYL",name:"Eyelid flash",def:"Raises the brows to show pale eyelids at another individual.",
+       cue:["Two adults stand a few metres apart over a patch of fallen fruit.","One stares at the other and raises its brows, flashing pale white eyelids.","The other backs off and moves away."],
+       note:"The white eyelids make this threat easy to see in dim forest light."},
+      {code:"GRM",name:"Allogrooming",def:"Parts and cleans another individual's fur with the hands.",
+       cue:["An adult lies on its side on a low log.","Another sits behind it, parting the fur along its back with both hands.","It picks at the skin and eats small particles."],
+       note:"In many monkey groups, grooming is directed up the hierarchy more often than down."}
+    ]}
+};
+const SP_KEYS = Object.keys(SPECIES);
+const TOTAL_BEHS = SP_KEYS.reduce((n,k)=>n+SPECIES[k].behs.length,0);
+
+/* ---------- Species portraits (field-guide illustrations) ---------- */
+const PORTRAIT_ART = {
+  PT: `
+    <path d="M8 200 C16 158 50 142 100 142 C150 142 184 158 192 200 Z" fill="#1B1715"/>
+    <ellipse cx="37" cy="98" rx="17" ry="21" fill="#7E5E4A"/><ellipse cx="39" cy="99" rx="9" ry="12" fill="#5E4434"/>
+    <ellipse cx="163" cy="98" rx="17" ry="21" fill="#7E5E4A"/><ellipse cx="161" cy="99" rx="9" ry="12" fill="#5E4434"/>
+    <path d="M48 96 C46 58 70 42 100 42 C130 42 154 58 152 96 C154 122 140 142 100 146 C60 142 46 122 48 96 Z" fill="#1B1715"/><path d="M48 96 C46 58 70 42 100 42 C130 42 154 58 152 96 C154 122 140 142 100 146 C60 142 46 122 48 96 Z" fill="url(#SHD)"/>
+    <path d="M62 88 C62 74 138 74 138 88 C140 100 134 108 126 110 L74 110 C66 108 60 100 62 88 Z" fill="#8A6A55"/>
+    <ellipse cx="84" cy="96" rx="6.2" ry="5.0" fill="#1A1210"/><circle cx="84" cy="96" r="4" fill="#6E4424"/><circle cx="84" cy="96.3" r="2.1" fill="#0A0604"/><circle cx="85.5" cy="94.5" r="1.3" fill="#fff" opacity=".95"/><ellipse cx="116" cy="96" rx="6.2" ry="5.0" fill="#1A1210"/><circle cx="116" cy="96" r="4" fill="#6E4424"/><circle cx="116" cy="96.3" r="2.1" fill="#0A0604"/><circle cx="117.5" cy="94.5" r="1.3" fill="#fff" opacity=".95"/>
+    <path d="M58 88 C64 74 88 72 100 80 C112 72 136 74 142 88 C132 85 116 85 100 91 C84 85 68 85 58 88 Z" fill="#6A4E3C"/>
+    <path d="M64 108 C62 96 138 96 136 108 C144 132 130 160 100 162 C70 160 56 132 64 108 Z" fill="#A07A62"/><path d="M64 108 C62 96 138 96 136 108 C144 132 130 160 100 162 C70 160 56 132 64 108 Z" fill="url(#SHD)"/>
+    <ellipse cx="100" cy="114" rx="22" ry="9" fill="#B08A70" opacity=".55"/>
+    <ellipse cx="100" cy="112" rx="11" ry="6" fill="#7E5E4A"/>
+    <ellipse cx="95" cy="114" rx="3.4" ry="2.3" fill="#2A201C"/><ellipse cx="105" cy="114" rx="3.4" ry="2.3" fill="#2A201C"/>
+    <path d="M78 144 Q100 149 122 144 Q100 145 78 144 Z" fill="#B8927A"/>
+    <defs><clipPath id="chinClipPT"><path d="M64 108 C62 96 138 96 136 108 C144 132 130 160 100 162 C70 160 56 132 64 108 Z"/></clipPath><radialGradient id="chinPT" gradientUnits="userSpaceOnUse" cx="100" cy="162" r="30" gradientTransform="translate(0 162) scale(1 .6) translate(0 -162)"><stop offset="0" stop-color="#A9A39D"/><stop offset=".5" stop-color="#A9A39D" stop-opacity=".75"/><stop offset="1" stop-color="#A9A39D" stop-opacity="0"/></radialGradient></defs><ellipse cx="100" cy="162" rx="34" ry="20" fill="url(#chinPT)" clip-path="url(#chinClipPT)"/>
+    <path d="M70 141 Q100 142 130 141" stroke="#3A2E2A" stroke-width="2.6" fill="none" stroke-linecap="round"/>`,
+  PP: `
+    <path d="M10 200 C16 160 52 142 100 142 C148 142 184 160 190 200 Z" fill="#1A1716"/>
+    <ellipse cx="51" cy="98" rx="9" ry="12" fill="#2A2422"/><ellipse cx="149" cy="98" rx="9" ry="12" fill="#2A2422"/>
+    <path d="M50 100 C46 62 72 40 100 40 C128 40 154 62 150 100 C152 126 136 146 100 150 C64 146 48 126 50 100 Z" fill="#1A1716"/><path d="M50 100 C46 62 72 40 100 40 C128 40 154 62 150 100 C152 126 136 146 100 150 C64 146 48 126 50 100 Z" fill="url(#SHD)"/>
+    <path d="M70 88 C70 71 130 71 130 88 C134 110 126 150 100 152 C74 150 66 110 70 88 Z" fill="#3A302C"/><path d="M70 88 C70 71 130 71 130 88 C134 110 126 150 100 152 C74 150 66 110 70 88 Z" fill="url(#SHD)"/>
+    <path d="M70 88 C78 80 90 80 100 85 C110 80 122 80 130 88 C120 86 110 87 100 90 C90 87 80 86 70 88 Z" fill="#2C2421"/>
+    <ellipse cx="86" cy="97" rx="10.5" ry="8" fill="#524039"/><ellipse cx="114" cy="97" rx="10.5" ry="8" fill="#524039"/>
+    <ellipse cx="86" cy="97" rx="6.4" ry="5.1" fill="#1A1210"/><circle cx="86" cy="97" r="4.6" fill="#6E4520"/><circle cx="86" cy="97.3" r="2.4" fill="#0A0604"/><circle cx="87.7" cy="95.3" r="1.5" fill="#fff" opacity=".95"/><ellipse cx="114" cy="97" rx="6.4" ry="5.1" fill="#1A1210"/><circle cx="114" cy="97" r="4.6" fill="#6E4520"/><circle cx="114" cy="97.3" r="2.4" fill="#0A0604"/><circle cx="115.7" cy="95.3" r="1.5" fill="#fff" opacity=".95"/>
+    <path d="M74 112 C74 104 126 104 126 112 C128 132 118 150 100 152 C82 150 72 132 74 112 Z" fill="#463A35"/><path d="M74 112 C74 104 126 104 126 112 C128 132 118 150 100 152 C82 150 72 132 74 112 Z" fill="url(#SHD)"/>
+    <ellipse cx="100" cy="139" rx="21" ry="12" fill="#6E5244" opacity=".7"/>
+    <path d="M91 108 C93 104 107 104 109 108 L113 118 C107 121 93 121 87 118 Z" fill="#40352F"/>
+    <ellipse cx="94.5" cy="118" rx="3.6" ry="2.3" fill="#171211"/><ellipse cx="105.5" cy="118" rx="3.6" ry="2.3" fill="#171211"/>
+    <path d="M83 136 Q100 144 117 136 Q100 138 83 136 Z" fill="#7E5C4C"/>
+    <path d="M81 135 Q100 136 119 135" stroke="#2A201D" stroke-width="2" fill="none" stroke-linecap="round"/>`,
+  CJ: `
+    <path d="M134 206 C168 206 178 180 172 150 C166 122 152 100 154 74 C156 50 166 32 177 30 C188 29 190 40 185 48" stroke="#433B34" stroke-width="16" fill="none" stroke-linecap="round"/><path d="M134 206 C168 206 178 180 172 150 C166 122 152 100 154 74 C156 50 166 32 177 30 C188 29 190 40 185 48" stroke="#DDD7CD" stroke-width="16" fill="none" stroke-dasharray="8 8"/>
+    <path d="M50 200 C54 170 74 150 100 150 C126 150 146 170 150 200 Z" fill="#8E877E"/>
+    <clipPath id="mbody"><path d="M50 200 C54 170 74 150 100 150 C126 150 146 170 150 200 Z"/></clipPath>
+    <g clip-path="url(#mbody)"><path d="M30 170 Q100 156 170 170 L170 177 Q100 163 30 177 Z" fill="#DDD7CD"/><path d="M30 181 Q100 167 170 181 L170 187 Q100 173 30 187 Z" fill="#433B34"/><path d="M30 191 Q100 177 170 191 L170 198 Q100 184 30 198 Z" fill="#DDD7CD"/></g>
+    <g transform="translate(76 96) scale(.78) translate(-76 -96)"><path d="M74 118 C58 122 34 124 20 108 C8 92 14 68 28 56 C42 46 62 56 78 76 Z" fill="#F7F6F3"/>
+    <path d="M72 108 C58 110 40 110 30 100 C22 90 26 74 36 66 C46 60 60 68 72 84 Z" fill="#F7F6F3"/></g>
+    <g transform="translate(124 96) scale(.78) translate(-124 -96)"><path d="M126 118 C142 122 166 124 180 108 C192 92 186 68 172 56 C158 46 138 56 122 76 Z" fill="#F7F6F3"/>
+    <path d="M128 108 C142 110 160 110 170 100 C178 90 174 74 164 66 C154 60 140 68 128 84 Z" fill="#F7F6F3"/></g>
+    <path d="M60 104 C58 74 78 58 100 58 C122 58 142 74 140 104 C142 132 124 152 100 154 C76 152 58 132 60 104 Z" fill="#5E5650"/><path d="M60 104 C58 74 78 58 100 58 C122 58 142 74 140 104 C142 132 124 152 100 154 C76 152 58 132 60 104 Z" fill="url(#SHD)"/>
+    <path d="M75 94 C75 80 125 80 125 94 C127 112 117 134 100 136 C83 134 73 112 75 94 Z" fill="#B98C74"/><path d="M75 94 C75 80 125 80 125 94 C127 112 117 134 100 136 C83 134 73 112 75 94 Z" fill="url(#SHD)"/>
+    <defs><radialGradient id="blazeCJ" cx="50%" cy="45%" r="50%"><stop offset="0" stop-color="#EEE3D7" stop-opacity=".8"/><stop offset=".3" stop-color="#E8D9CB" stop-opacity=".55"/><stop offset=".65" stop-color="#DCC6B4" stop-opacity=".2"/><stop offset="1" stop-color="#C9A890" stop-opacity="0"/></radialGradient></defs><clipPath id="faceClipCJ"><path d="M75 94 C75 80 125 80 125 94 C127 112 117 134 100 136 C83 134 73 112 75 94 Z"/></clipPath><ellipse cx="100" cy="88" rx="11" ry="13" fill="url(#blazeCJ)" clip-path="url(#faceClipCJ)"/>
+    <ellipse cx="87" cy="98" rx="6.6" ry="5.3" fill="#1A1210"/><circle cx="87" cy="98" r="5" fill="#8A4A1E"/><circle cx="87" cy="98.3" r="2.6" fill="#0A0604"/><circle cx="88.9" cy="96.1" r="1.7" fill="#fff" opacity=".95"/><ellipse cx="113" cy="98" rx="6.6" ry="5.3" fill="#1A1210"/><circle cx="113" cy="98" r="5" fill="#8A4A1E"/><circle cx="113" cy="98.3" r="2.6" fill="#0A0604"/><circle cx="114.9" cy="96.1" r="1.7" fill="#fff" opacity=".95"/>
+    <ellipse cx="100" cy="121" rx="14" ry="11" fill="#C9A08A"/>
+    <ellipse cx="96" cy="114" rx="2.2" ry="1.7" fill="#4A2A20"/><ellipse cx="104" cy="114" rx="2.2" ry="1.7" fill="#4A2A20"/>
+    <path d="M93 126 Q100 127 107 126" stroke="#5A3A2E" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+`,
+  CA: `
+    <path d="M140 172 C166 154 174 120 166 98 C160 82 166 66 177 68 C185 70 185 82 178 86" stroke="#666264" stroke-width="11" fill="none" stroke-linecap="round"/>
+    <path d="M28 200 C32 160 58 132 100 130 C142 132 168 160 172 200 Z" fill="#6A6668"/>
+    <ellipse cx="57" cy="96" rx="6" ry="8.5" fill="#504A4C"/><ellipse cx="143" cy="96" rx="6" ry="8.5" fill="#504A4C"/>
+    <path d="M58 96 C56 62 78 46 100 46 C122 46 144 62 142 96 C142 124 124 142 100 144 C76 142 58 124 58 96 Z" fill="#6E6A6C"/><path d="M58 96 C56 62 78 46 100 46 C122 46 144 62 142 96 C142 124 124 142 100 144 C76 142 58 124 58 96 Z" fill="url(#SHD)"/>
+    <path d="M74 88 C74 76 126 76 126 88 C130 110 120 136 100 138 C80 136 70 110 74 88 Z" fill="#4E4649"/><path d="M74 88 C74 76 126 76 126 88 C130 110 120 136 100 138 C80 136 70 110 74 88 Z" fill="url(#SHD)"/>
+    <ellipse cx="89" cy="92" rx="7.5" ry="4" fill="#ECE8E2"/><ellipse cx="111" cy="92" rx="7.5" ry="4" fill="#ECE8E2"/>
+    <ellipse cx="89" cy="97" rx="5.8" ry="4.6" fill="#1A1210"/><circle cx="89" cy="97" r="3.8" fill="#7A4E28"/><circle cx="89" cy="97.3" r="2" fill="#0A0604"/><circle cx="90.4" cy="95.6" r="1.3" fill="#fff" opacity=".95"/><ellipse cx="111" cy="97" rx="5.8" ry="4.6" fill="#1A1210"/><circle cx="111" cy="97" r="3.8" fill="#7A4E28"/><circle cx="111" cy="97.3" r="2" fill="#0A0604"/><circle cx="112.4" cy="95.6" r="1.3" fill="#fff" opacity=".95"/>
+    <ellipse cx="100" cy="122" rx="14" ry="11" fill="#595053"/>
+    <ellipse cx="96" cy="117" rx="2.3" ry="1.7" fill="#1E181A"/><ellipse cx="104" cy="117" rx="2.3" ry="1.7" fill="#1E181A"/>
+    <path d="M92 127 Q100 128 108 127" stroke="#1E181A" stroke-width="1.8" fill="none" stroke-linecap="round"/>`
+};
+function portraitSVG(sp){ const id="shd-"+sp;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><defs><radialGradient id="${id}" cx="38%" cy="30%" r="78%"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".38"/></radialGradient><radialGradient id="${id}b" cx="50%" cy="35%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><rect width="200" height="200" fill="${SPECIES[sp].bg}"/><rect width="200" height="200" fill="url(#${id}b)"/>${PORTRAIT_ART[sp].replace(/url\(#SHD\)/g,`url(#${id})`)}</svg>`; }
+const PORTRAIT_IMG = {};
+SP_KEYS.forEach(sp=>{ const im=new Image(); im.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(portraitSVG(sp)); PORTRAIT_IMG[sp]=im; });
+const portraitHTML=(sp,cls)=>`<div class="portrait ${cls||""}" role="img" aria-label="${SPECIES[sp].name} illustration">${portraitSVG(sp)}</div>`;
+
+/* ---------- World ---------- */
+const W=2400, H=1600;
+let seed = 20260923;
+function rnd(){ seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }
+const R=(a,b)=>a+rnd()*(b-a);
+const riverY = x => 820 + 90*Math.sin(x/260) + 40*Math.sin(x/90+1.3);
+const RIVER_HALF = 24;
+function zoneAt(x,y){
+  if (Math.abs(y-riverY(x))<RIVER_HALF) return "river";
+  if (x<520) return "plot";
+  return y<riverY(x) ? "north" : "south";
+}
+const ZONE_NAME = {north:"North bank forest",south:"South bank forest",plot:"West gallery plot",river:"River ford (wading)"};
+
+const off = document.createElement("canvas"); off.width=W; off.height=H;
+(function paintWorld(){
+  const c = off.getContext("2d");
+  c.fillStyle="#2C4731"; c.fillRect(0,0,W,H);
+  c.fillStyle="#35522F"; c.fillRect(0,0,520,H);
+  // texture
+  for(let i=0;i<5000;i++){ const x=R(0,W),y=R(0,H); const z=zoneAt(x,y);
+    c.fillStyle = (rnd()<.5?"rgba(120,160,90,.10)":"rgba(0,0,0,.10)");
+    c.beginPath(); c.ellipse(x,y,R(3,14),R(3,10),R(0,3),0,7); c.fill(); }
+  // clearings
+  for(let i=0;i<22;i++){ const x=R(40,W-40), y=R(40,H-40); if(Math.abs(y-riverY(x))<90) continue;
+    c.fillStyle="rgba(120,150,80,.55)"; c.beginPath(); c.ellipse(x,y,R(30,70),R(22,50),R(0,3),0,7); c.fill(); }
+  // canopy
+  for(let i=0;i<1700;i++){ const x=R(0,W), y=R(0,H); if(Math.abs(y-riverY(x))<RIVER_HALF+12) continue;
+    const r=R(10,26), plot=x<520;
+    c.fillStyle = plot ? "#284A2A" : "#20392A"; c.beginPath(); c.arc(x+2,y+3,r,0,7); c.fill();
+    c.fillStyle = plot ? "#3E6A36" : "#335A3A"; c.beginPath(); c.arc(x,y,r*.92,0,7); c.fill();
+    c.fillStyle = "rgba(170,210,130,.12)"; c.beginPath(); c.arc(x-r*.3,y-r*.3,r*.45,0,7); c.fill(); }
+  // river
+  const path=()=>{ c.beginPath(); for(let x=-20;x<=W+20;x+=8){ const y=riverY(x); x===-20?c.moveTo(x,y):c.lineTo(x,y);} };
+  c.lineCap="round"; c.lineJoin="round";
+  path(); c.strokeStyle="#8A8156"; c.lineWidth=RIVER_HALF*2+14; c.stroke();
+  path(); c.strokeStyle="#3C7888"; c.lineWidth=RIVER_HALF*2; c.stroke();
+  path(); c.strokeStyle="rgba(150,200,210,.35)"; c.lineWidth=10; c.stroke();
+  // trails
+  c.setLineDash([10,8]); c.strokeStyle="rgba(236,224,190,.6)"; c.lineWidth=3;
+  const trail=(pts)=>{ c.beginPath(); pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1])); c.stroke(); };
+  trail([[0,420],[300,390],[600,440],[900,400],[1200,430],[1500,380],[1800,420],[2100,360],[2400,400]]);
+  trail([[0,1230],[350,1190],[700,1260],[1050,1210],[1400,1270],[1750,1220],[2100,1260],[2400,1230]]);
+  trail([[1200,0],[1180,300],[1220,600],[1190,820],[1230,1100],[1200,1600]]);
+  trail([[700,440],[640,700],[720,1000],[700,1260]]);
+  c.setLineDash([]);
+})();
+
+/* ---------- Behaviour scenes ---------- */
+const BODY={PT:"#1B1715",PP:"#1A1716",CJ:"#8E877E",CA:"#6A6668"};
+function bust(sp,x,y,s,flip,rot){ return `<g transform="translate(${x} ${y}) rotate(${rot||0}) scale(${flip?-s:s} ${s}) translate(-100 -100)">${PORTRAIT_ART[sp].replace(/url\(#SHD\)/g,"url(#scnShd)")}</g>`; }
+function head(sp,x,y,s){ return `<g transform="translate(${x} ${y}) scale(${s}) translate(-100 -100)"><g clip-path="url(#scnHead)">${PORTRAIT_ART[sp].replace(/url\(#SHD\)/g,"url(#scnShd)")}</g></g>`; }
+const P={
+  trunk:(x,w)=>`<path d="M${x} 0 L${x+w} 0 L${x+w+6} 160 L${x-6} 160 Z" fill="#6B5440"/><path d="M${x+w*.3} 0 L${x+w*.45} 0 L${x+w*.5} 160 L${x+w*.25} 160 Z" fill="#7C6450"/>`,
+  mound:(x)=>`<path d="M${x-44} 158 C${x-34} 120 ${x-16} 64 ${x} 60 C${x+16} 64 ${x+34} 120 ${x+44} 158 Z" fill="#A07650"/><ellipse cx="${x-8}" cy="104" rx="4" ry="3" fill="#5E4230"/><ellipse cx="${x+12}" cy="128" rx="4" ry="3" fill="#5E4230"/>`,
+  stick:(x1,y1,x2,y2)=>`<path d="M${x1} ${y1} L${x2} ${y2}" stroke="#7A5A3A" stroke-width="3" stroke-linecap="round"/>`,
+  arm:(x1,y1,x2,y2,c)=>`<path d="M${x1} ${y1} Q${(x1+x2)/2} ${Math.min(y1,y2)-16} ${x2} ${y2}" stroke="${c}" stroke-width="12" stroke-linecap="round" fill="none"/>`,
+  fruit:(x,y)=>`<circle cx="${x}" cy="${y}" r="10" fill="#E08A2E"/><ellipse cx="${x+4}" cy="${y-11}" rx="6" ry="3" fill="#4E7A46" transform="rotate(-25 ${x+4} ${y-11})"/>`,
+  nut:(x,y)=>`<circle cx="${x}" cy="${y}" r="8" fill="#7A5230"/><path d="M${x+14} ${y+10} a7 7 0 0 1 14 0 Z" fill="#8E6440"/><path d="M${x-26} ${y+12} a6 6 0 0 1 12 0 Z" fill="#8E6440"/>`,
+  sound:(x,y)=>[0,1,2].map(i=>`<path d="M${x+i*10} ${y-12-i*4} Q${x+10+i*12} ${y} ${x+i*10} ${y+12+i*4}" stroke="#FFFFFF" stroke-width="2.5" fill="none" opacity="${.9-i*.25}" stroke-linecap="round"/>`).join(""),
+  branch:(x1,y1,x2,y2)=>`<path d="M${x1} ${y1} L${x2} ${y2}" stroke="#6B5440" stroke-width="6" stroke-linecap="round"/><ellipse cx="${x1+6}" cy="${y1-6}" rx="9" ry="4" fill="#5E8A4E" transform="rotate(-30 ${x1+6} ${y1-6})"/>`,
+  puffs:(x,y)=>[0,1,2].map(i=>`<circle cx="${x-i*16}" cy="${y-i*3}" r="${8-i*2}" fill="#D8CBB0" opacity="${.8-i*.2}"/>`).join(""),
+  stems:(x)=>[0,1,2].map(i=>`<path d="M${x+i*8} 150 L${x+14+i*6} ${70+i*6}" stroke="#5E8A4E" stroke-width="3" stroke-linecap="round"/><ellipse cx="${x+14+i*6}" cy="${68+i*6}" rx="7" ry="3" fill="#6FA05A" transform="rotate(-50 ${x+14+i*6} ${68+i*6})"/>`).join(""),
+  nest:(x,y)=>`<ellipse cx="${x}" cy="${y}" rx="46" ry="13" fill="#7A6A3A"/><ellipse cx="${x}" cy="${y-3}" rx="36" ry="7" fill="#5E4E2A"/><ellipse cx="${x-30}" cy="${y+2}" rx="10" ry="4" fill="#6FA05A"/><ellipse cx="${x+32}" cy="${y}" rx="9" ry="4" fill="#6FA05A"/>`,
+  holes:(x)=>[[x+10,52],[x+22,78],[x+8,98],[x+24,120]].map(([a,b])=>`<ellipse cx="${a}" cy="${b}" rx="4" ry="6" fill="#3E2E20"/><ellipse cx="${a}" cy="${b+6}" rx="2.5" ry="3" fill="#E8C24A" opacity=".85"/>`).join(""),
+  scent:(x,y)=>[0,1,2,3,4].map(i=>`<circle cx="${x+i*14}" cy="${y-i*2}" r="${3+i*.4}" fill="#C9B27A" opacity="${.35+i*.1}"/>`).join(""),
+  litter:()=>[[40,164,"#9A6A3A"],[70,170,"#C08A40"],[250,166,"#9A6A3A"],[285,172,"#C08A40"],[110,174,"#7A5230"],[215,176,"#C08A40"]].map(([a,b,c])=>`<ellipse cx="${a}" cy="${b}" rx="9" ry="3.5" fill="${c}" transform="rotate(${(a%30)-15} ${a} ${b})"/>`).join(""),
+};
+function sceneSVG(sp,code){
+  const C=BODY[sp], z=SPECIES[sp].zones[0];
+  const sky= sp==="CJ"?["#E9EFD2","#C9DDB0"]:["#D6E6CF","#A9C8A2"];
+  let back="", mid="", front="";
+  const one=(x)=>bust(sp,x,108,.55);
+  const pair=()=>bust(sp,112,112,.5)+bust(sp,214,108,.55,true);
+  switch(code){
+    case "GRM": mid=pair()+P.arm(214-26,132,134,110,C); break;
+    case "RST": back=P.trunk(60,40); mid=one(185); break;
+    case "TLU": back=P.mound(90); mid=one(210)+P.stick(104,98,170,134); break;
+    case "DSP": mid=one(200)+P.branch(118,150,158,126)+P.puffs(110,156); break;
+    case "PHT": back=P.trunk(44,32); mid=one(170)+P.sound(214,74); break;
+    case "FSH": mid=pair()+P.fruit(160,138); break;
+    case "PLY": mid=bust(sp,120,122,.44,false,-14)+bust(sp,206,120,.44,true,12); break;
+    case "BIP": mid=P.stems(96)+one(190); break;
+    case "NST": back=P.trunk(146,28); mid=bust(sp,160,74,.36); front=P.nest(160,102); break;
+    case "GUG": back=P.trunk(170,44)+P.holes(170); mid=bust(sp,128,110,.5); break;
+    case "SCM": back=`<path d="M0 96 L320 84" stroke="#6B5440" stroke-width="10" stroke-linecap="round"/>`; mid=one(200)+P.scent(60,120); break;
+    case "INC": mid=one(170)+head(sp,140,128,.2)+head(sp,204,126,.22); break;
+    case "PHE": back=P.trunk(40,30); mid=one(170)+P.sound(212,76); break;
+    case "FGR": mid=one(170); front=P.litter(); break;
+    case "NUT": mid=one(195)+P.nut(126,142); break;
+    case "LPS": mid=pair(); break;
+    case "EYL": mid=pair(); break;
+    default: mid=one(160);
+  }
+  const trees=[20,95,250,300].map((x,i)=>`<rect x="${x}" y="0" width="${10+i%2*6}" height="160" fill="#8FAE86" opacity=".6"/>`).join("")
+    +[[40,18,50],[130,8,60],[230,14,56],[300,20,44]].map(([x,y,r])=>`<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r*.55}" fill="#7FA676" opacity=".7"/>`).join("");
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="${esc(SPECIES[sp].name)} scene">
+    <defs><linearGradient id="scnSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sky[0]}"/><stop offset="1" stop-color="${sky[1]}"/></linearGradient>
+    <radialGradient id="scnShd" cx="38%" cy="30%" r="78%"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".38"/></radialGradient>
+    <clipPath id="scnHead"><circle cx="100" cy="98" r="60"/></clipPath></defs>
+    <rect width="320" height="180" fill="url(#scnSky)"/>${trees}${back}${mid}
+    <path d="M0 152 C60 146 120 156 180 150 C240 145 290 154 320 150 L320 180 L0 180 Z" fill="#6E5A3E"/>
+    <path d="M0 160 C70 156 140 164 210 158 C260 154 300 160 320 158 L320 180 L0 180 Z" fill="#5E4C34"/>${front}</svg>`;
+}
+
+/* ---------- State ---------- */
+const player = {x:1210, y:560, dest:null, heading:0};
+const cam = {x:player.x, y:player.y};
+let groups = [];
+let log = [];
+let learned = {}; SP_KEYS.forEach(k=>learned[k]=new Set());
+let scanUntil=0, scanReadyAt=0;
+const FLEE=10;
+let fieldDay=1;
+try{ const d=JSON.parse(localStorage.getItem("transect-day")||"null"); if(d){ fieldDay=d.day||1; } }catch(e){}
+function saveDay(){ try{ localStorage.setItem("transect-day",JSON.stringify({day:fieldDay})); }catch(e){} }
+let toastT=0;
+function toast(msg,ms){ const t=document.getElementById("toast"); t.textContent=msg; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>{t.hidden=true;},ms||4200); }
+let obs=null; // {g, stage, shown, options, choice}
+let keys={};
+try { const s=JSON.parse(localStorage.getItem("transect-log")||"null"); if(s&&Array.isArray(s.log)){ log=s.log.filter(e=>SPECIES[e.sp]); log.forEach(e=>{ if(e.ok && learned[e.sp] && SPECIES[e.sp].behs.some(x=>x.code===e.code)) learned[e.sp].add(e.code); }); } } catch(e){}
+function save(){ try{ localStorage.setItem("transect-log", JSON.stringify({log})); }catch(e){} }
+
+let idN=1;
+function makeGroup(sp, near){
+  const S=SPECIES[sp]; let x,y,tries=0;
+  do { x=R(40,W-40); y=R(40,H-40); tries++; }
+  while(tries<500 && (!S.zones.includes(zoneAt(x,y)) || (!near && Math.hypot(x-player.x,y-player.y)<380)));
+  if(near){ x=near.x; y=near.y; }
+  const bi = Math.floor(rnd()*S.behs.length), b=S.behs[bi];
+  const sex = b.sex || ["M","F","F","J"][Math.floor(rnd()*4)];
+  const a=R(0,6.28);
+  return {id:idN++, sp, x, y, vx:Math.cos(a)*R(4,9), vy:Math.sin(a)*R(4,9), bi,
+          indiv:`${sp}-${sex}${String(Math.floor(R(1,40))).padStart(2,"0")}`};
+}
+SP_KEYS.forEach(sp=>{ for(let i=0;i<4;i++) groups.push(makeGroup(sp)); });
+// one chimp party close to the start so the first view has something to follow
+groups.push(makeGroup("PT",{x:1330,y:500}));
+
+/* ---------- Canvas ---------- */
+const cv=document.getElementById("map"), ctx=cv.getContext("2d"), wrap=document.getElementById("mapwrap");
+let cw=0,ch=0,dpr=1;
+function resize(){ const r=wrap.getBoundingClientRect(); dpr=Math.min(2,window.devicePixelRatio||1);
+  cw=r.width; ch=r.height; cv.width=Math.round(cw*dpr); cv.height=Math.round(ch*dpr); }
+new ResizeObserver(resize).observe(wrap); resize();
+
+const DETECT=110, IDENT=60, RANGE=40, SCAN=260;
+function levelOf(g){ const d=Math.hypot(g.x-player.x,g.y-player.y);
+  if(g.wary && performance.now()<g.wary) return d<IDENT?2:(d<DETECT?1:0);
+  if(d<RANGE) return 3; if(d<IDENT) return 2;
+  if(performance.now()<scanUntil && d<SCAN) return 2;
+  if(d<DETECT) return 1; return 0; }
+
+function toScreen(x,y){ return [x-cam.x+cw/2, y-cam.y+ch/2]; }
+cv.addEventListener("pointerdown", e=>{
+  if(obs) return;
+  const r=cv.getBoundingClientRect(); const px=e.clientX-r.left, py=e.clientY-r.top;
+  let wx=px-cw/2+cam.x, wy=py-ch/2+cam.y;
+  for(const g of groups){ const L=levelOf(g); if(L>=1){ const [sx,sy]=toScreen(g.x,g.y); if(Math.hypot(sx-px,sy-py)<32){
+      if(L===3){ startObs(g); return; }
+      if(moveMode==="gps"){ toast("In GPS mode you move by walking. Head towards the animal."); return; }
+      const dx=g.x-player.x, dy=g.y-player.y, d=Math.hypot(dx,dy), stop=RANGE-8;
+      wx=d>stop? g.x-dx/d*stop : player.x; wy=d>stop? g.y-dy/d*stop : player.y; break; } } }
+  if(moveMode==="gps"){ toast("In GPS mode you move by walking. Switch to Tap to move by tapping."); return; }
+  player.dest={x:Math.max(10,Math.min(W-10,wx)), y:Math.max(10,Math.min(H-10,wy))};
+});
+addEventListener("keydown",e=>{ if(tutEls) return; const k=e.key.toLowerCase(); if(["arrowup","arrowdown","arrowleft","arrowright","w","a","s","d"].includes(k)){ if(e.target.tagName!=="INPUT"){ keys[k]=true; e.preventDefault(); } } });
+addEventListener("keyup",e=>{ keys[e.key.toLowerCase()]=false; });
+
+document.getElementById("scanBtn").addEventListener("click",()=>{
+  const now=performance.now(); if(now<scanReadyAt) return;
+  scanUntil=now+6000; scanReadyAt=now+6000; updateScanBtn();
+});
+function updateScanBtn(){ const b=document.getElementById("scanBtn"); const now=performance.now();
+  if(now<scanReadyAt){ b.disabled=true; b.textContent=`Binoculars ready in ${Math.ceil((scanReadyAt-now)/1000)} s`; }
+  else { b.disabled=false; b.textContent="Scan with binoculars"; } }
+
+let last=performance.now();
+function step(now){
+  const dt=Math.min(.05,(now-last)/1000); last=now;
+  // player movement
+  if(!obs && moveMode==="gps"){
+    if(player.gpsTarget){ const dx=player.gpsTarget.x-player.x, dy=player.gpsTarget.y-player.y;
+      if(Math.hypot(dx,dy)>.5){ player.heading=Math.atan2(dy,dx); player.x+=dx*Math.min(1,dt*3); player.y+=dy*Math.min(1,dt*3); } }
+  } else if(!obs){
+    let mx=(keys.arrowright||keys.d?1:0)-(keys.arrowleft||keys.a?1:0), my=(keys.arrowdown||keys.s?1:0)-(keys.arrowup||keys.w?1:0);
+    if(mx||my){ player.dest=null; }
+    else if(player.dest){ const dx=player.dest.x-player.x, dy=player.dest.y-player.y, d=Math.hypot(dx,dy);
+      if(d<3) player.dest=null; else { mx=dx/d; my=dy/d; } }
+    if(mx||my){ const n=Math.hypot(mx,my); const sp=(zoneAt(player.x,player.y)==="river"?38:95)*dt;
+      player.x=Math.max(10,Math.min(W-10,player.x+mx/n*sp)); player.y=Math.max(10,Math.min(H-10,player.y+my/n*sp));
+      player.heading=Math.atan2(my,mx); }
+  }
+  // animals wander within their zones
+  for(const g of groups){
+    if(obs && obs.g===g) continue;
+    const dist=Math.hypot(g.x-player.x,g.y-player.y);
+    if(dist<FLEE && !(g.wary && now<g.wary)){
+      g.wary=now+25000; const a=Math.atan2(g.y-player.y,g.x-player.x); g.vx=Math.cos(a)*45; g.vy=Math.sin(a)*45;
+      player.dest=null;
+      toast(`Too close! The ${SPECIES[g.sp].name.toLowerCase()}s moved off. Stop about 40 m away so you don't disturb them.`);
+    }
+    if(g.wary && now>=g.wary){ g.wary=0; const a=R(0,6.28); g.vx=Math.cos(a)*6; g.vy=Math.sin(a)*6; }
+    if(!(g.wary && now<g.wary) && dist<RANGE+15) continue; // animals settle while you watch them
+    if(!(g.wary && now<g.wary) && rnd()<.01){ const a=R(0,6.28), s=R(3,10); g.vx=Math.cos(a)*s; g.vy=Math.sin(a)*s; }
+    const nx=g.x+g.vx*dt, ny=g.y+g.vy*dt;
+    if(SPECIES[g.sp].zones.includes(zoneAt(nx,ny)) && nx>20&&nx<W-20&&ny>20&&ny<H-20){ g.x=nx; g.y=ny; } else { g.vx*=-1; g.vy*=-1; }
+  }
+  cam.x+= (player.x-cam.x)*Math.min(1,dt*6); cam.y+=(player.y-cam.y)*Math.min(1,dt*6);
+  draw(now);
+  requestAnimationFrame(step);
+}
+
+function draw(now){
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle="#1d2e1d"; ctx.fillRect(0,0,cw,ch);
+  const sx=cam.x-cw/2, sy=cam.y-ch/2;
+  ctx.drawImage(off, sx, sy, cw, ch, 0, 0, cw, ch);
+  // survey grid, 200 m
+  ctx.strokeStyle="rgba(255,255,255,.08)"; ctx.lineWidth=1; ctx.font="10px 'JetBrains Mono', monospace"; ctx.fillStyle="rgba(255,255,255,.35)";
+  for(let gx=Math.ceil(sx/200)*200; gx<sx+cw; gx+=200){ const x=gx-sx; ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,ch); ctx.stroke(); ctx.fillText("E"+String(gx).padStart(4,"0"), x+3, 12); }
+  for(let gy=Math.ceil(sy/200)*200; gy<sy+ch; gy+=200){ const y=gy-sy; ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(cw,y); ctx.stroke(); ctx.fillText("N"+String(H-gy).padStart(4,"0"), 3, y-3); }
+  // detection radius
+  const [px,py]=toScreen(player.x,player.y);
+  ctx.setLineDash([4,6]); ctx.strokeStyle="rgba(255,255,255,.28)"; ctx.beginPath(); ctx.arc(px,py,DETECT,0,7); ctx.stroke(); ctx.setLineDash([]);
+  if(now<scanUntil){ const k=(scanUntil-now)/6000; ctx.strokeStyle=`rgba(240,102,63,${.5*k})`; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(px,py,SCAN,0,7); ctx.stroke(); ctx.lineWidth=1; }
+  // destination flag
+  if(player.dest){ const [dx,dy]=toScreen(player.dest.x,player.dest.y);
+    ctx.strokeStyle="#F0663F"; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(dx-5,dy-5); ctx.lineTo(dx+5,dy+5); ctx.moveTo(dx+5,dy-5); ctx.lineTo(dx-5,dy+5); ctx.stroke(); ctx.lineWidth=1; }
+  // animals
+  for(const g of groups){ const L=levelOf(g); if(!L) continue; const [x,y]=toScreen(g.x,g.y); const S=SPECIES[g.sp];
+    if(L===1){ const p=4*Math.sin(now/260+g.id);
+      ctx.strokeStyle="rgba(255,255,255,.75)"; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(x,y,14+p,0,7); ctx.stroke();
+      ctx.strokeStyle="rgba(255,255,255,.3)"; ctx.beginPath(); ctx.arc(x,y,22+p,0,7); ctx.stroke();
+      ctx.fillStyle="#fff"; ctx.font="600 13px 'Source Sans 3', sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText("?",x,y+1);
+    } else {
+      const r=L===3?21:18;
+      if(L===3){ const p=3*Math.sin(now/200); ctx.strokeStyle="#F0663F"; ctx.lineWidth=2.5; ctx.beginPath(); ctx.arc(x,y,r+7+p,0,7); ctx.stroke(); }
+      ctx.fillStyle="rgba(0,0,0,.35)"; ctx.beginPath(); ctx.arc(x+1.5,y+2.5,r,0,7); ctx.fill();
+      ctx.save(); ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.clip();
+      ctx.fillStyle=S.bg; ctx.fillRect(x-r,y-r,r*2,r*2);
+      const im=PORTRAIT_IMG[g.sp]; if(im.complete && im.naturalWidth) ctx.drawImage(im,x-r*1.25,y-r*1.2,r*2.5,r*2.5);
+      ctx.restore();
+      ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.strokeStyle="rgba(255,255,255,.95)"; ctx.lineWidth=2.5; ctx.stroke();
+    }
+    ctx.lineWidth=1;
+  }
+  // player
+  ctx.fillStyle="rgba(0,0,0,.35)"; ctx.beginPath(); ctx.arc(px+1,py+2,10,0,7); ctx.fill();
+  ctx.save(); ctx.translate(px,py); ctx.rotate(player.heading);
+  ctx.fillStyle="#F0663F"; ctx.beginPath(); ctx.moveTo(17,0); ctx.lineTo(9,-6); ctx.lineTo(9,6); ctx.closePath(); ctx.fill(); ctx.restore();
+  ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(px,py,9,0,7); ctx.fill();
+  ctx.fillStyle="#F0663F"; ctx.beginPath(); ctx.arc(px,py,5,0,7); ctx.fill();
+  // north arrow + scale bar
+  ctx.textAlign="center"; ctx.textBaseline="alphabetic";
+  const nx=cw-26, ny=34; ctx.fillStyle="rgba(15,24,17,.72)"; ctx.beginPath(); ctx.arc(nx,ny,18,0,7); ctx.fill();
+  ctx.fillStyle="#F3F6EF"; ctx.beginPath(); ctx.moveTo(nx,ny-12); ctx.lineTo(nx-6,ny+4); ctx.lineTo(nx+6,ny+4); ctx.closePath(); ctx.fill();
+  ctx.font="600 9px 'JetBrains Mono', monospace"; ctx.fillText("N",nx,ny+14);
+  ctx.strokeStyle="#F3F6EF"; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(cw-122,62); ctx.lineTo(cw-122,68); ctx.lineTo(cw-22,68); ctx.lineTo(cw-22,62); ctx.stroke(); ctx.lineWidth=1;
+  ctx.fillText("100 m", cw-72, 82);
+}
+
+/* ---------- Movement mode: tap or GPS ---------- */
+let moveMode="tap", geoWatch=null, geoOrigin=null, geoBase=null;
+function setModeUI(m){ document.getElementById("modeTap").setAttribute("aria-pressed",String(m==="tap")); document.getElementById("modeGps").setAttribute("aria-pressed",String(m==="gps"));
+  document.getElementById("moveHint").textContent = m==="gps" ? "GPS mode: walk outside to move. 1 m walked = 1 m on the reserve." : "Tap the map to walk (or use arrow keys). Stop about 40 m away: closer and the animals move off."; }
+function stopGps(){ if(geoWatch!==null && navigator.geolocation) navigator.geolocation.clearWatch(geoWatch); geoWatch=null; geoOrigin=null; player.gpsTarget=null; }
+function setMode(m){
+  if(m===moveMode) return;
+  if(m==="tap"){ stopGps(); moveMode="tap"; setModeUI("tap"); return; }
+  if(!("geolocation" in navigator)){ toast("This device can't share its location, so GPS mode isn't available. Staying in tap mode."); return; }
+  moveMode="gps"; player.dest=null; setModeUI("gps"); toast("Looking for a GPS signal…",8000);
+  try{
+    geoWatch=navigator.geolocation.watchPosition(pos=>{
+      if(moveMode!=="gps") return;
+      const la=pos.coords.latitude, lo=pos.coords.longitude;
+      if(!geoOrigin){ geoOrigin={la,lo}; geoBase={x:player.x,y:player.y}; toast("GPS on. Walk around outside to explore the reserve.");}
+      const dy=(la-geoOrigin.la)*111320, dx=(lo-geoOrigin.lo)*111320*Math.cos(la*Math.PI/180);
+      player.gpsTarget={x:Math.max(10,Math.min(W-10,geoBase.x+dx)), y:Math.max(10,Math.min(H-10,geoBase.y-dy))};
+    }, err=>{
+      stopGps(); moveMode="tap"; setModeUI("tap");
+      toast(err && err.code===1 ? "Location access isn't allowed here, so GPS mode can't start. You're back in tap mode. It works when the game runs as its own web page or app." : "Couldn't get a GPS signal. You're back in tap mode.",7000);
+    }, {enableHighAccuracy:true, maximumAge:2000, timeout:20000});
+  }catch(e){ stopGps(); moveMode="tap"; setModeUI("tap"); toast("GPS mode couldn't start here. You're back in tap mode.",6000); }
+}
+document.getElementById("modeTap").addEventListener("click",()=>setMode("tap"));
+document.getElementById("modeGps").addEventListener("click",()=>setMode("gps"));
+
+/* ---------- Panel ---------- */
+const pane=document.getElementById("pane");
+let tab="field";
+const tabs={field:"tab-field",notes:"tab-notes",guide:"tab-guide"};
+Object.entries(tabs).forEach(([k,id])=>document.getElementById(id).addEventListener("click",()=>{ tab=k; lastField=""; renderPane(); }));
+
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function compass(dx,dy){ const a=(Math.atan2(dx,-dy)*180/Math.PI+360)%360; return ["N","NE","E","SE","S","SW","W","NW"][Math.round(a/45)%8]; }
+function gridRef(x,y){ return `E${String(Math.round(x)).padStart(4,"0")} N${String(Math.round(H-y)).padStart(4,"0")}`; }
+const badge=(sp,size)=>portraitHTML(sp, size==="s"?"s":"m");
+
+function nearest(){ let best=null,bd=1e9; for(const g of groups){ const d=Math.hypot(g.x-player.x,g.y-player.y); if(d<bd){bd=d;best=g;} } return [best,bd]; }
+
+function fieldHTML(){
+  if(obs) return obsHTML();
+  const inRange = groups.filter(g=>levelOf(g)===3).sort((a,b)=>Math.hypot(a.x-player.x,a.y-player.y)-Math.hypot(b.x-player.x,b.y-player.y))[0];
+  if(inRange){ const S=SPECIES[inRange.sp];
+    return `<div class="stack">
+      <div><div class="eyebrow">In observation range</div><h2>${esc(S.name)} spotted</h2>
+      <p class="muted">You're close enough to watch without disturbing them. Tap the animal on the map or the button below to start a focal sample, then code what it's doing.</p></div>
+      ${portraitHTML(inRange.sp,"xl")}
+      <div class="plate" style="grid-template-columns:1fr"><div><h3>${esc(S.name)}</h3><div class="sci">${esc(S.sci)}</div>
+        <dl class="kv" style="margin:8px 0 0"><dt>Focal</dt><dd>${inRange.indiv}</dd></dl></div></div>
+      <button class="btn" id="startObs" data-id="${inRange.id}">Begin focal sample</button></div>`; }
+  const [g,d]=nearest(); const dir=compass(g.x-player.x,g.y-player.y); const m=Math.round(d/5)*5;
+  const L=levelOf(g);
+  let lead, sub;
+  if(L===2){ lead=`${SPECIES[g.sp].name}s ${m} m to the ${dir}`; sub="Identified from a distance. Walk closer to start observing."; }
+  else if(L===1){ lead=`Rustling ${m} m to the ${dir}`; sub="Something is moving in the vegetation. Approach, or scan with binoculars to identify it."; }
+  else { lead=`Faint calls to the ${dir}`; sub=`Roughly ${Math.round(d/50)*50} m away. Follow the trails or head ${dir} to pick up the signs.`; }
+  const done=log.length;
+  return `<div class="stack">
+    <div style="display:flex;gap:14px;align-items:flex-start">${L===2?portraitHTML(g.sp,"m"):""}<div><div class="eyebrow">Walking transect · ${esc(ZONE_NAME[zoneAt(player.x,player.y)])}</div><h2>${lead}</h2><p class="muted" style="margin:0">${sub}</p></div></div>
+    <div class="note small"><b>How it works.</b> Signs appear inside your dashed detection ring. Get within about 40 m, but not closer than 10 m or they'll move off. Then run a focal sample: watch the individual, then code its behaviour against the ethogram. Correct codes fill in your ethogram; wrong ones are corrected and still logged.</div>
+    <div><div class="eyebrow" style="margin-bottom:8px">Study species</div><div class="prog">${SP_KEYS.map(k=>`<div class="progrow">${badge(k,"s")}<div><b>${SPECIES[k].name}</b> <span class="muted small">· ${SPECIES[k].habitat}</span></div></div>`).join("")}</div></div>
+    <p class="muted small">${done ? `${done} observation${done>1?"s":""} in the notebook.` : "No observations logged yet."} Species from different continents share this training reserve so you can practise all four in one walk.</p>
+  </div>`;
+}
+
+function obsHTML(){
+  const g=obs.g, S=SPECIES[g.sp], b=S.behs[g.bi];
+  const cues=b.cue.slice(0,obs.shown).map(c=>`<p class="cue" style="margin:0">${esc(c)}</p>`).join("");
+  let bottom="";
+  if(obs.stage==="cues"){ bottom=`<div class="bar"><i id="obsBar"></i></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span class="muted small">Focal sample running · keep still</span><span class="timer" id="obsTimer">0:00 / ${fmtT(obs.total)}</span></div>
+    <button class="btn ghost" id="stopObs">Stop sample</button>`; }
+  else {
+    bottom=`<div class="eyebrow">Code the behaviour</div><div class="opts">${obs.options.map(i=>{ const o=S.behs[i];
+      let cls=""; if(obs.stage==="result"){ if(i===g.bi) cls="right"; else if(i===obs.choice) cls="wrong"; }
+      return `<button class="opt ${cls}" data-i="${i}" ${obs.stage==="result"?"disabled":""}><code>${o.code}</code><span><b>${esc(o.name)}</b><br><span class="muted small">${esc(o.def)}</span></span></button>`; }).join("")}</div>`;
+    if(obs.stage==="result"){ const ok=obs.choice===g.bi;
+      bottom+=`<p class="verdict ${ok?"good":"bad"}">${ok?`Confirmed: ${b.code}, ${esc(b.name)}.`:`Not quite. This was ${b.code}, ${esc(b.name)}.`}</p>
+        <div class="note">${esc(b.note)}</div>
+        <button class="btn" id="logBtn">Log observation and move on</button>`; }
+  }
+  return `<div class="stack">
+    <div style="display:flex;gap:14px;align-items:center">${portraitHTML(g.sp,"m")}<div><div class="eyebrow">Focal sample · ${g.indiv}</div><h2 style="margin-bottom:2px">${esc(S.name)}</h2><div class="sci">${esc(S.sci)} · ${gridRef(g.x,g.y)}</div></div></div>
+    <div class="cues">${cues}</div>${bottom}</div>`;
+}
+function fmtT(ms){ const s=Math.floor(ms/1000); return `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`; }
+
+function stats(){
+  let score=0, streak=0, best=0, ok=0;
+  for(const e of log){ if(e.ok){ ok++; streak++; best=Math.max(best,streak); score+=10+(streak>=3?5:0); } else { streak=0; score+=2; } }
+  return {score, ok, n:log.length, acc: log.length?Math.round(ok/log.length*100):0, streak, best};
+}
+function badgeList(){
+  const st=stats(), seen=new Set(log.map(e=>e.sp));
+  const list=[
+    {id:"first", ico:"1", name:"First entry", desc:"Log your first observation", got: st.n>=1},
+    {id:"ten", ico:"10", name:"Field regular", desc:"Log 10 observations", got: st.n>=10},
+    {id:"eye", ico:"5×", name:"Sharp eye", desc:"Code 5 behaviours right in a row", got: st.best>=5},
+    {id:"all", ico:"4", name:"Four-species day", desc:"Observe all four species", got: SP_KEYS.every(k=>seen.has(k))},
+  ];
+  SP_KEYS.forEach(k=>list.push({id:"eth-"+k, sp:k, name:`${SPECIES[k].name} ethogram`, desc:`Confirm all ${SPECIES[k].behs.length} ${SPECIES[k].name.toLowerCase()} behaviours`, got: learned[k].size===SPECIES[k].behs.length}));
+  return list;
+}
+function badgesHTML(){
+  return `<div class="badges">${badgeList().map(b=>`<div class="bdg ${b.got?"":"locked"}">${b.sp?portraitHTML(b.sp,"s"):`<span class="ico">${b.ico}</span>`}<span><b>${esc(b.name)}</b><span class="muted">${esc(b.desc)}</span></span></div>`).join("")}</div>`;
+}
+function notesHTML(){
+  const n=Object.values(learned).reduce((a,s)=>a+s.size,0);
+  const prog=`<div class="prog">${SP_KEYS.map(k=>{ const S=SPECIES[k]; return `<div class="progrow">${badge(k,"s")}<div><div style="display:flex;justify-content:space-between"><b>${S.name}</b><span class="code muted">${learned[k].size}/${S.behs.length}</span></div>
+    <div class="chips">${S.behs.map(b=>`<span class="chip ${learned[k].has(b.code)?"on":""}" title="${esc(b.name)}">${b.code}</span>`).join("")}</div></div></div>`; }).join("")}</div>`;
+  const rows = log.length ? `<div class="entries">${log.slice().reverse().map(e=>`<div class="entry"><span class="t">${e.time}</span>
+      <div><div class="what"><span class="code">${e.code}</span> ${esc(e.name)} · ${esc(SPECIES[e.sp].name)}</div><div class="sub">${e.indiv} · ${e.grid} · ${esc(e.zone)}</div></div>
+      <span class="pill ${e.ok?"ok":"fix"}">${e.ok?"Confirmed":"Corrected"}</span></div>`).join("")}</div>`
+    : `<div class="empty">Your notebook is empty. Walk toward a sign on the map and run your first focal sample.</div>`;
+  const st=stats();
+  return `<div class="stack">
+    <div><div class="eyebrow">Field day ${fieldDay}</div><h2>Your progress</h2></div>
+    <div class="stats"><div class="stat"><b>${st.score}</b>Score</div><div class="stat"><b>${st.n?st.acc+"%":"–"}</b>Accuracy</div><div class="stat"><b>${st.best}</b>Best streak</div></div>
+    <div><div class="eyebrow" style="margin-bottom:6px">Badges</div>${badgesHTML()}</div>
+    <div><div class="eyebrow">Ethogram coverage</div><h3 style="margin:4px 0 8px">${n} of ${TOTAL_BEHS} behaviours confirmed</h3></div>${prog}
+    <div><div class="eyebrow" style="margin-bottom:4px">Observation log</div>${rows}</div>
+    <button class="btn" id="newDay">Start a new field day</button>
+    ${log.length?`<button class="btn ghost" id="clearLog">Clear notebook</button><div id="clearConfirm" hidden><p class="small">Delete all ${log.length} entries from this browser?</p><div style="display:flex;gap:8px"><button class="btn" id="clearYes">Delete entries</button><button class="btn ghost" id="clearNo">Keep them</button></div></div>`:""}</div>`;
+}
+
+function guideHTML(){
+  return `<div class="stack"><div><div class="eyebrow">Reference</div><h2>Ethogram</h2>
+    <p class="muted">An ethogram lists a species' behaviours with short operational definitions, so every observer codes the same thing the same way.</p></div>
+    <div>${SP_KEYS.map(k=>{ const S=SPECIES[k]; return `<details><summary>${badge(k,"s")}<span><b>${S.name}</b> <span class="sci">${S.sci}</span></span><span class="code muted">${learned[k].size}/${S.behs.length}</span></summary>
+      ${S.behs.map(b=>`<div class="beh"><span class="code">${b.code}</span><span><b>${esc(b.name)}</b>${esc(b.def)}</span></div>`).join("")}</details>`; }).join("")}</div></div>`;
+}
+
+let lastField="";
+function renderPane(){
+  Object.entries(tabs).forEach(([k,id])=>document.getElementById(id).setAttribute("aria-selected",String(k===tab)));
+  document.getElementById("logCount").textContent = log.length?`(${log.length})`:"";
+  document.getElementById("ethoCount").textContent = `${Object.values(learned).reduce((a,s)=>a+s.size,0)} / ${TOTAL_BEHS}`;
+  document.getElementById("scoreVal").textContent = stats().score;
+  const html = tab==="field"?fieldHTML():tab==="notes"?notesHTML():guideHTML();
+  if(html!==lastField){ pane.innerHTML=html; lastField=html; }
+}
+
+pane.addEventListener("click",e=>{
+  const t=e.target.closest("button"); if(!t) return;
+  if(t.id==="startObs"){ const g=groups.find(x=>x.id===+t.dataset.id); if(g) startObs(g); }
+  else if(t.classList.contains("opt") && obs && obs.stage==="choose"){ obs.choice=+t.dataset.i; obs.stage="result"; renderPane(); }
+  else if(t.id==="logBtn") finishObs();
+  else if(t.id==="stopObs"){ obs=null; lastField=""; renderPane(); toast("Sample stopped. Nothing was logged."); }
+  else if(t.id==="newDay"){ fieldDay++; saveDay(); groups=[]; SP_KEYS.forEach(sp=>{ for(let i=0;i<4;i++) groups.push(makeGroup(sp)); }); lastField=""; renderPane(); toast(`Field day ${fieldDay}. The animals have moved to new spots.`); }
+  else if(t.id==="clearLog"){ document.getElementById("clearConfirm").hidden=false; t.hidden=true; }
+  else if(t.id==="clearNo"){ lastField=""; renderPane(); }
+  else if(t.id==="clearYes"){ log=[]; SP_KEYS.forEach(k=>learned[k]=new Set()); save(); lastField=""; renderPane(); }
+});
+
+function startObs(g){
+  player.dest=null; const S=SPECIES[g.sp];
+  const others=S.behs.map((_,i)=>i).filter(i=>i!==g.bi).sort(()=>rnd()-.5).slice(0,3);
+  obs={g, stage:"cues", shown:1, options:[g.bi,...others].sort(()=>rnd()-.5), choice:null};
+  tab="field"; renderPane();
+  const total=S.behs[g.bi].cue.length, per=2400; const t0=performance.now(); obs.total=per*total;
+  const tick=()=>{ if(!obs||obs.g!==g||obs.stage!=="cues") return;
+    const el=(performance.now()-t0); const bar=document.getElementById("obsBar"); if(bar) bar.style.width=Math.min(100,el/(per*total)*100)+"%";
+    const tm=document.getElementById("obsTimer"); if(tm) tm.textContent=`${fmtT(Math.min(el,per*total))} / ${fmtT(per*total)}`;
+    const want=Math.min(total,1+Math.floor(el/per));
+    if(want!==obs.shown){ obs.shown=want; renderPane(); }
+    if(el>=per*total){ obs.stage="choose"; renderPane(); return; }
+    requestAnimationFrame(tick); };
+  requestAnimationFrame(tick);
+}
+function finishObs(){
+  const before=new Set(badgeList().filter(b=>b.got).map(b=>b.id));
+  const g=obs.g, S=SPECIES[g.sp], b=S.behs[g.bi], ok=obs.choice===g.bi;
+  const d=new Date();
+  log.push({time:`${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`, sp:g.sp, indiv:g.indiv, code:b.code, name:b.name, ok, grid:gridRef(g.x,g.y), zone:ZONE_NAME[zoneAt(g.x,g.y)]});
+  if(ok) learned[g.sp].add(b.code);
+  save();
+  groups=groups.filter(x=>x!==g); groups.push(makeGroup(g.sp));
+  obs=null; lastField=""; renderPane();
+  const fresh=badgeList().filter(b=>b.got && !before.has(b.id));
+  if(fresh.length) toast(`Badge earned: ${fresh.map(b=>b.name).join(", ")}!`,5000);
+  else { const st=stats(); toast(ok?`+${10+(st.streak>=3?5:0)} points${st.streak>=3?` · streak ${st.streak}`:""}`:"+2 points for logging it. Check the ethogram and try again next time.",2600); }
+}
+
+setInterval(()=>{ document.getElementById("gridref").textContent=gridRef(player.x,player.y);
+  document.getElementById("zoneLabel").textContent=ZONE_NAME[zoneAt(player.x,player.y)];
+  updateScanBtn(); if(tab==="field" && !obs) renderPane(); },300);
+
+/* ---------- Tutorial ---------- */
+const TUT=[
+  {t:"Welcome, field researcher", b:"You're on a training reserve with four primate species. Your job: find them, watch what they do, and record their behaviour like a real primatologist. This takes about a minute.", at:null},
+  {t:"This is you", b:"The orange dot in the middle of the map is you, and the arrow shows which way you're facing. Tap anywhere on the map to walk there, or use the arrow keys.", at:()=>mapSpot(26)},
+  {t:"Listen for signs", b:"The dashed ring is how far you can hear. When an animal is inside it, a pulsing ? appears where something is rustling. The Field panel also tells you which direction to head.", at:()=>mapSpot(122)},
+  {t:"Use your binoculars", b:"Scanning identifies animals much further away, so you know what's there before you walk over.", at:()=>el("scanBtn")},
+  {t:"Approach carefully", b:"Once you're within about 40 m, an orange ring appears around the animal. Don't go closer than 10 m, or it will move off. Tapping an animal walks you to a safe distance automatically.", at:()=>mapSpot(80)},
+  {t:"Run a focal sample", b:"Tap the animal, or press Begin focal sample in this panel. Watch closely: what it does appears here, line by line, while the timer runs.", at:()=>el("pane")},
+  {t:"Code the behaviour", b:"When the sample ends, pick the ethogram code that matches what you saw. Unsure? The Ethogram tab lists every behaviour with its definition.", at:()=>el("tab-guide")},
+  {t:"Track your progress", b:"The Notebook keeps every observation, your score, accuracy and badges. Start a new field day there to send the animals to new spots.", at:()=>el("tab-notes")},
+];
+let tutI=-1, tutEls=null;
+function el(id){ return document.getElementById(id); }
+function mapSpot(r){ const b=el("mapwrap").getBoundingClientRect(); const cx=b.left+b.width/2, cy=b.top+b.height/2; return {rect:{left:cx-r,top:cy-r,width:r*2,height:r*2}, round:true}; }
+function tutOpen(){
+  if(tutEls) return;
+  const block=document.createElement("div"); block.className="tut-block";
+  const hole=document.createElement("div"); hole.className="tut-hole";
+  const card=document.createElement("div"); card.className="tut-card"; card.setAttribute("role","dialog"); card.setAttribute("aria-modal","true"); card.setAttribute("aria-labelledby","tutTitle");
+  document.body.append(block,hole,card); tutEls={block,hole,card};
+  card.addEventListener("click",e=>{ const t=e.target.closest("button"); if(!t) return;
+    if(t.id==="tutNext") tutGo(tutI+1); else if(t.id==="tutBack") tutGo(tutI-1); else if(t.id==="tutSkip") tutClose(); });
+  addEventListener("keydown",tutKey); addEventListener("resize",tutPlace);
+  player.dest=null; tutGo(0);
+}
+function tutKey(e){ if(!tutEls) return; if(e.key==="Escape") tutClose(); else if(e.key==="ArrowRight"){ e.preventDefault(); e.stopPropagation(); tutGo(tutI+1);} else if(e.key==="ArrowLeft"){ e.preventDefault(); e.stopPropagation(); tutGo(tutI-1);} }
+function tutClose(){ if(!tutEls) return; Object.values(tutEls).forEach(n=>n.remove()); tutEls=null; tutI=-1;
+  removeEventListener("keydown",tutKey); removeEventListener("resize",tutPlace);
+  try{ localStorage.setItem("transect-tutorial","done"); }catch(e){} keys={}; el("helpBtn").focus(); }
+function tutGo(i){
+  if(i<0) return; if(i>=TUT.length){ tutClose(); return; }
+  tutI=i; const st=TUT[i], last=i===TUT.length-1;
+  tutEls.card.innerHTML=`<div class="eyebrow">Step ${i+1} of ${TUT.length}</div><h3 id="tutTitle">${esc(st.t)}</h3><p>${esc(st.b)}</p>
+    <div class="tut-foot"><div class="tut-dots" aria-hidden="true">${TUT.map((_,k)=>`<i class="${k===i?"on":""}"></i>`).join("")}</div><span class="sp"></span>
+    ${i>0?`<button class="btn ghost" id="tutBack">Back</button>`:`<button class="tut-skip" id="tutSkip">Skip tutorial</button>`}
+    <button class="btn" id="tutNext">${last?"Start exploring":i===0?"Show me":"Next"}</button></div>`;
+  tutPlace(); el("tutNext").focus();
+}
+function tutPlace(){
+  if(!tutEls||tutI<0) return; const st=TUT[tutI], {hole,card}=tutEls, vw=innerWidth, vh=innerHeight, pad=8, M=16;
+  let r=null, round=false;
+  if(st.at){ const t=st.at(); if(t && t.rect){ r=t.rect; round=t.round; } else if(t){ const b=t.getBoundingClientRect(); r={left:b.left-pad,top:b.top-pad,width:b.width+pad*2,height:b.height+pad*2}; } }
+  if(r){ hole.style.display="block"; Object.assign(hole.style,{left:r.left+"px",top:r.top+"px",width:r.width+"px",height:r.height+"px",borderRadius:round?"50%":"10px"}); }
+  else { hole.style.display="block"; Object.assign(hole.style,{left:vw/2+"px",top:vh/2+"px",width:"0px",height:"0px",borderRadius:"50%"}); }
+  const cw=card.offsetWidth, chh=card.offsetHeight; let x,y;
+  if(!r){ x=(vw-cw)/2; y=(vh-chh)/2; }
+  else {
+    const below=r.top+r.height+12, above=r.top-12-chh, right=r.left+r.width+12, left=r.left-12-cw;
+    if(below+chh<=vh-M){ y=below; x=r.left+r.width/2-cw/2; }
+    else if(above>=M){ y=above; x=r.left+r.width/2-cw/2; }
+    else if(right+cw<=vw-M){ x=right; y=r.top+r.height/2-chh/2; }
+    else if(left>=M){ x=left; y=r.top+r.height/2-chh/2; }
+    else { x=(vw-cw)/2; y=vh-chh-M; }
+  }
+  card.style.left=Math.max(M,Math.min(vw-cw-M,x))+"px"; card.style.top=Math.max(M,Math.min(vh-chh-M,y))+"px";
+}
+el("helpBtn").addEventListener("click",tutOpen);
+let tutSeen=false; try{ tutSeen=localStorage.getItem("transect-tutorial")==="done"; }catch(e){}
+
+renderPane();
+requestAnimationFrame(step);
+if(!tutSeen) setTimeout(tutOpen,400);
+})();
+</script>
+
+</body>
+</html>
