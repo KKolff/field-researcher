@@ -158,14 +158,13 @@ summary::-webkit-details-marker{display:none}
       <span>Ethogram <b id="ethoCount">0 / 19</b></span>
       <span>Score <b id="scoreVal">0</b></span>
       <span><button class="helpbtn" id="helpBtn">How to play</button></span>
-      <span>Move <span class="seg" role="group" aria-label="Movement mode"><button id="modeTap" aria-pressed="true">Tap</button><button id="modeGps" aria-pressed="false">GPS</button></span></span>
     </div>
   </header>
   <div class="main">
     <div class="mapwrap" id="mapwrap">
       <canvas id="map" aria-label="Field site map. Tap or click to walk; arrow keys also move you."></canvas>
       <div class="overlay ov-tl" id="zoneLabel">Forest</div>
-      <div class="overlay ov-bl" id="moveHint">Tap the map to walk (or use arrow keys). Stop about 40 m away: closer and the animals move off.</div>
+      <div class="overlay ov-bl" id="moveHint">Tap the map to walk (or use arrow keys). Get within 40 m to observe, but not closer than 10 m.</div>
       <div class="toast" id="toast" hidden></div>
       <div class="overlay ov-br"><button class="btn map" id="scanBtn">Scan with binoculars</button></div>
     </div>
@@ -491,10 +490,8 @@ cv.addEventListener("pointerdown", e=>{
   let wx=px-cw/2+cam.x, wy=py-ch/2+cam.y;
   for(const g of groups){ const L=levelOf(g); if(L>=1){ const [sx,sy]=toScreen(g.x,g.y); if(Math.hypot(sx-px,sy-py)<32){
       if(L===3){ startObs(g); return; }
-      if(moveMode==="gps"){ toast("In GPS mode you move by walking. Head towards the animal."); return; }
       const dx=g.x-player.x, dy=g.y-player.y, d=Math.hypot(dx,dy), stop=RANGE-8;
       wx=d>stop? g.x-dx/d*stop : player.x; wy=d>stop? g.y-dy/d*stop : player.y; break; } } }
-  if(moveMode==="gps"){ toast("In GPS mode you move by walking. Switch to Tap to move by tapping."); return; }
   player.dest={x:Math.max(10,Math.min(W-10,wx)), y:Math.max(10,Math.min(H-10,wy))};
 });
 addEventListener("keydown",e=>{ if(tutEls) return; const k=e.key.toLowerCase(); if(["arrowup","arrowdown","arrowleft","arrowright","w","a","s","d"].includes(k)){ if(e.target.tagName!=="INPUT"){ keys[k]=true; e.preventDefault(); } } });
@@ -512,10 +509,7 @@ let last=performance.now();
 function step(now){
   const dt=Math.min(.05,(now-last)/1000); last=now;
   // player movement
-  if(!obs && moveMode==="gps"){
-    if(player.gpsTarget){ const dx=player.gpsTarget.x-player.x, dy=player.gpsTarget.y-player.y;
-      if(Math.hypot(dx,dy)>.5){ player.heading=Math.atan2(dy,dx); player.x+=dx*Math.min(1,dt*3); player.y+=dy*Math.min(1,dt*3); } }
-  } else if(!obs){
+  if(!obs){
     let mx=(keys.arrowright||keys.d?1:0)-(keys.arrowleft||keys.a?1:0), my=(keys.arrowdown||keys.s?1:0)-(keys.arrowup||keys.w?1:0);
     if(mx||my){ player.dest=null; }
     else if(player.dest){ const dx=player.dest.x-player.x, dy=player.dest.y-player.y, d=Math.hypot(dx,dy);
@@ -592,32 +586,6 @@ function draw(now){
   ctx.strokeStyle="#F3F6EF"; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(cw-122,62); ctx.lineTo(cw-122,68); ctx.lineTo(cw-22,68); ctx.lineTo(cw-22,62); ctx.stroke(); ctx.lineWidth=1;
   ctx.fillText("100 m", cw-72, 82);
 }
-
-/* ---------- Movement mode: tap or GPS ---------- */
-let moveMode="tap", geoWatch=null, geoOrigin=null, geoBase=null;
-function setModeUI(m){ document.getElementById("modeTap").setAttribute("aria-pressed",String(m==="tap")); document.getElementById("modeGps").setAttribute("aria-pressed",String(m==="gps"));
-  document.getElementById("moveHint").textContent = m==="gps" ? "GPS mode: walk outside to move. 1 m walked = 1 m on the reserve." : "Tap the map to walk (or use arrow keys). Stop about 40 m away: closer and the animals move off."; }
-function stopGps(){ if(geoWatch!==null && navigator.geolocation) navigator.geolocation.clearWatch(geoWatch); geoWatch=null; geoOrigin=null; player.gpsTarget=null; }
-function setMode(m){
-  if(m===moveMode) return;
-  if(m==="tap"){ stopGps(); moveMode="tap"; setModeUI("tap"); return; }
-  if(!("geolocation" in navigator)){ toast("This device can't share its location, so GPS mode isn't available. Staying in tap mode."); return; }
-  moveMode="gps"; player.dest=null; setModeUI("gps"); toast("Looking for a GPS signal…",8000);
-  try{
-    geoWatch=navigator.geolocation.watchPosition(pos=>{
-      if(moveMode!=="gps") return;
-      const la=pos.coords.latitude, lo=pos.coords.longitude;
-      if(!geoOrigin){ geoOrigin={la,lo}; geoBase={x:player.x,y:player.y}; toast("GPS on. Walk around outside to explore the reserve.");}
-      const dy=(la-geoOrigin.la)*111320, dx=(lo-geoOrigin.lo)*111320*Math.cos(la*Math.PI/180);
-      player.gpsTarget={x:Math.max(10,Math.min(W-10,geoBase.x+dx)), y:Math.max(10,Math.min(H-10,geoBase.y-dy))};
-    }, err=>{
-      stopGps(); moveMode="tap"; setModeUI("tap");
-      toast(err && err.code===1 ? "Location access isn't allowed here, so GPS mode can't start. You're back in tap mode. It works when the game runs as its own web page or app." : "Couldn't get a GPS signal. You're back in tap mode.",7000);
-    }, {enableHighAccuracy:true, maximumAge:2000, timeout:20000});
-  }catch(e){ stopGps(); moveMode="tap"; setModeUI("tap"); toast("GPS mode couldn't start here. You're back in tap mode.",6000); }
-}
-document.getElementById("modeTap").addEventListener("click",()=>setMode("tap"));
-document.getElementById("modeGps").addEventListener("click",()=>setMode("gps"));
 
 /* ---------- Panel ---------- */
 const pane=document.getElementById("pane");
