@@ -164,7 +164,7 @@ summary::-webkit-details-marker{display:none}
   <div class="main">
     <div class="mapwrap" id="mapwrap">
       <canvas id="map" aria-label="Field site map. Tap or click to walk; arrow keys also move you."></canvas>
-      <div class="overlay ov-tl" id="zoneLabel">North bank forest</div>
+      <div class="overlay ov-tl" id="zoneLabel">Forest</div>
       <div class="overlay ov-bl" id="moveHint">Tap the map to walk (or use arrow keys). Stop about 40 m away: closer and the animals move off.</div>
       <div class="toast" id="toast" hidden></div>
       <div class="overlay ov-br"><button class="btn map" id="scanBtn">Scan with binoculars</button></div>
@@ -186,7 +186,7 @@ summary::-webkit-details-marker{display:none}
 const SPECIES = {
   PT:{name:"Chimpanzee",sci:"Pan troglodytes",fill:"#C98A4B",bg:"#EAD5B8",text:"#1C140C",zones:["north"],
     marks:"Dark grey face with a slightly paler muzzle, large ears standing out from the head, heavy brow ridge, black coat.",
-    habitat:"North bank forest",
+    habitat:"Forest",
     behs:[
       {code:"GRM",name:"Allogrooming",def:"Uses fingers or lips to part and clean another individual's hair.",
        cue:["Two adults sit close together at the base of a fig tree.","One parts the other's hair with its fingers and picks at the skin, bringing something to its lips.","The receiver lies still, eyes half-closed, one arm raised."],
@@ -203,7 +203,7 @@ const SPECIES = {
     ]},
   PP:{name:"Bonobo",sci:"Pan paniscus",fill:"#A98BE0",bg:"#DCD0F0",text:"#1B1330",zones:["south"],
     marks:"Black, heavily wrinkled face with a paler lower lip, rounder head, hair parted in the middle, slimmer build than a chimpanzee.",
-    habitat:"South bank forest",
+    habitat:"Forest",
     behs:[
       {code:"FSH",name:"Food sharing",def:"Food passes from one individual to another, tolerated by the holder.",
        cue:["An adult female holds a large fruit.","Another bonobo sits facing her, one hand held out, palm up.","She lets it take a piece and carries on eating."],
@@ -223,7 +223,7 @@ const SPECIES = {
     ]},
   CJ:{name:"Common marmoset",sci:"Callithrix jacchus",fill:"#EACB5A",bg:"#F1E3A8",text:"#2A2408",zones:["plot"],
     marks:"Tiny; white ear tufts, white blaze on the forehead, amber eyes, grey-white-brown banded coat and ringed tail.",
-    habitat:"West gallery plot",
+    habitat:"Forest",
     behs:[
       {code:"GUG",name:"Tree gouging",def:"Bites into bark with the lower incisors to make gum flow.",
        cue:["A small primate clings vertically to a trunk, tail hanging down.","It anchors its upper teeth and scrapes hard into the bark with its lower teeth.","The trunk around it is pocked with small oval holes, some glistening."],
@@ -241,9 +241,9 @@ const SPECIES = {
        cue:["Two marmosets sit pressed together on a horizontal branch.","One picks through the other's fur with its hands and teeth.","After a while they swap roles."],
        note:"Marmoset grooming is often returned within the same bout."}
     ]},
-  CA:{name:"Sooty mangabey",sci:"Cercocebus atys",fill:"#6FC3B8",bg:"#CBE7E2",text:"#0E2522",zones:["north","south"],
+  CA:{name:"Sooty mangabey",sci:"Cercocebus atys",fill:"#6FC3B8",bg:"#CBE7E2",text:"#0E2522",zones:["north"],
     marks:"Uniform smoky grey coat, dark grey face with a short muzzle and conspicuous pale eyelids.",
-    habitat:"Forest floor, both banks",
+    habitat:"Forest floor",
     behs:[
       {code:"FGR",name:"Ground foraging",def:"Searches leaf litter or soil for food while moving slowly.",
        cue:["A group moves slowly across the forest floor.","One turns over leaves and sticks with its hands, checking beneath each.","Its tail is held up and curled forward over its back."],
@@ -343,7 +343,7 @@ function zoneAt(x,y){
   if (x<520) return "plot";
   return y<riverY(x) ? "north" : "south";
 }
-const ZONE_NAME = {north:"North bank forest",south:"South bank forest",plot:"West gallery plot",river:"River ford (wading)"};
+const ZONE_NAME = {north:"Forest",south:"Forest",plot:"Forest",river:"River crossing (wading)"};
 
 const off = document.createElement("canvas"); off.width=W; off.height=H;
 (function paintWorld(){
@@ -653,7 +653,7 @@ function fieldHTML(){
   return `<div class="stack">
     <div style="display:flex;gap:14px;align-items:flex-start">${L===2?portraitHTML(g.sp,"m"):""}<div><div class="eyebrow">Walking transect · ${esc(ZONE_NAME[zoneAt(player.x,player.y)])}</div><h2>${lead}</h2><p class="muted" style="margin:0">${sub}</p></div></div>
     <div class="note small"><b>How it works.</b> Signs appear inside your dashed detection ring. Get within about 40 m, but not closer than 10 m or they'll move off. Then run a focal sample: watch the individual, then code its behaviour against the ethogram. Correct codes fill in your ethogram; wrong ones are corrected and still logged.</div>
-    <div><div class="eyebrow" style="margin-bottom:8px">Study species</div><div class="prog">${SP_KEYS.map(k=>`<div class="progrow">${badge(k,"s")}<div><b>${SPECIES[k].name}</b> <span class="muted small">· ${SPECIES[k].habitat}</span></div></div>`).join("")}</div></div>
+    <div><div class="eyebrow" style="margin-bottom:8px">Study species</div><div class="prog">${SP_KEYS.map(k=>`<div class="progrow">${badge(k,"s")}<div><b>${SPECIES[k].name}</b></div></div>`).join("")}</div></div>
     <p class="muted small">${done ? `${done} observation${done>1?"s":""} in the notebook.` : "No observations logged yet."} Species from different continents share this training reserve so you can practise all four in one walk.</p>
   </div>`;
 }
