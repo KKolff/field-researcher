@@ -106,11 +106,16 @@ summary::-webkit-details-marker{display:none}
 .beh b{display:block}
 .empty{padding:18px;border:1px dashed var(--line);border-radius:6px;color:var(--muted);text-align:center}
 .small{font-size:13px}
+.warn{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:6px;background:color-mix(in srgb,var(--bad) 13%,var(--surface));border:1px solid color-mix(in srgb,var(--bad) 45%,transparent);color:var(--ink);font-size:14px}
+.warn b{color:var(--bad)}
+.danger-flash{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 6px #E24030,inset 0 0 90px rgba(226,64,48,.55);animation:dflash .9s ease-out forwards;z-index:2}
+@keyframes dflash{from{opacity:1}to{opacity:0}}
+.guide-h{margin:18px 0 4px}
 .scene{width:100%;aspect-ratio:16/9;max-width:100%;border-radius:8px;overflow:hidden;box-shadow:0 0 0 1px var(--line)}
 .scene svg{display:block;width:100%;height:100%}
 .timer{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;color:var(--ink)}
 .toast{position:absolute;left:50%;top:44px;transform:translateX(-50%);background:rgba(15,24,17,.92);color:#F3F6EF;padding:9px 14px;border-radius:6px;font-size:13px;max-width:min(420px,86%);text-align:center;box-shadow:0 4px 16px rgba(0,0,0,.25);z-index:3}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:8px}
 .stat{background:var(--ground);border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-size:12px;color:var(--muted)}
 .stat b{display:block;font-family:var(--display);font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums}
 .badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
@@ -143,7 +148,7 @@ summary::-webkit-details-marker{display:none}
   .meta{gap:10px}
   .ov-bl{max-width:calc(100% - 180px);font-size:11px}
 }
-@media (prefers-reduced-motion:reduce){.cue,.portrait.xl{animation:none}}
+@media (prefers-reduced-motion:reduce){.cue,.portrait.xl,.danger-flash{animation:none}}
 </style>
 </head>
 <body style="margin:0">
@@ -164,8 +169,9 @@ summary::-webkit-details-marker{display:none}
     <div class="mapwrap" id="mapwrap">
       <canvas id="map" aria-label="Field site map. Tap or click to walk; arrow keys also move you."></canvas>
       <div class="overlay ov-tl" id="zoneLabel">Forest</div>
-      <div class="overlay ov-bl" id="moveHint">Tap the map to walk (or use arrow keys). Get within 40 m to observe, but not closer than 10 m.</div>
+      <div class="overlay ov-bl" id="moveHint">Tap the map to walk (or use arrow keys). Get within 40 m to observe, but don't walk into the animals.</div>
       <div class="toast" id="toast" hidden></div>
+      <div class="danger-flash" id="dangerFlash" hidden></div>
       <div class="overlay ov-br"><button class="btn map" id="scanBtn">Scan with binoculars</button></div>
     </div>
     <aside>
@@ -324,11 +330,47 @@ const PORTRAIT_ART = {
     <ellipse cx="96" cy="117" rx="2.3" ry="1.7" fill="#1E181A"/><ellipse cx="104" cy="117" rx="2.3" ry="1.7" fill="#1E181A"/>
     <path d="M92 127 Q100 128 108 127" stroke="#1E181A" stroke-width="1.8" fill="none" stroke-linecap="round"/>`
 };
+/* ---------- Hazard portraits ---------- */
+function snakeArt(c){ const H=c.headPath; return `
+    <ellipse cx="100" cy="172" rx="82" ry="28" fill="${c.body}"/><ellipse cx="100" cy="164" rx="64" ry="20" fill="${c.mid}"/><ellipse cx="100" cy="158" rx="46" ry="14" fill="${c.body}"/>
+    <g fill="${c.mark}">${[[40,170],[70,184],[108,188],[146,180],[160,166],[62,162],[140,160]].map(([x,y])=>`<rect x="${x-6}" y="${y-6}" width="12" height="12" rx="2" transform="rotate(45 ${x} ${y})"/>`).join("")}</g>
+    <g fill="${c.spot}" opacity=".85">${[[54,176],[90,186],[128,186],[154,174],[76,158],[124,156]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="3.2"/>`).join("")}</g>
+    <path d="M86 112 C82 128 80 142 78 158 L122 158 C120 142 118 128 114 112 Z" fill="${c.mid}"/>
+    <path d="M86 112 C82 128 80 142 78 158 L122 158 C120 142 118 128 114 112 Z" fill="url(#SHD)"/>
+    <path d="${H}" fill="${c.head}"/><path d="${H}" fill="url(#SHD)"/>
+    <path d="M98 58 L102 58 L101.5 118 L98.5 118 Z" fill="${c.stripe}" opacity=".75"/>
+    <path d="M66 82 L78 104 L84 86 Z M134 82 L122 104 L116 86 Z" fill="${c.cheek}"/>
+    <ellipse cx="72" cy="80" rx="7" ry="6" fill="${c.eye}"/><ellipse cx="72" cy="80" rx="1.7" ry="4.8" fill="#120C08"/><circle cx="74" cy="77.5" r="1.2" fill="#fff" opacity=".9"/>
+    <ellipse cx="128" cy="80" rx="7" ry="6" fill="${c.eye}"/><ellipse cx="128" cy="80" rx="1.7" ry="4.8" fill="#120C08"/><circle cx="130" cy="77.5" r="1.2" fill="#fff" opacity=".9"/>
+    <ellipse cx="95" cy="116" rx="1.8" ry="1.3" fill="#2A1E16"/><ellipse cx="105" cy="116" rx="1.8" ry="1.3" fill="#2A1E16"/>
+    ${c.horns?`<path d="M92 121 L95 130 L98 121 Z M102 121 L105 130 L108 121 Z" fill="${c.head}"/>`:""}
+    ${c.rhino?`<path d="M92 118 L82 132 L96 122 Z M108 118 L118 132 L104 122 Z" fill="#9CCBB2"/><path d="M96 122 L91 136 L99 125 Z M104 122 L109 136 L101 125 Z" fill="#9CCBB2"/>
+      <path d="M74 64 L100 96 L126 64 L118 64 L100 86 L82 64 Z" fill="#141A1E" opacity=".85"/>`:""}`; }
+Object.assign(PORTRAIT_ART,{
+  EL: `
+    <path d="M16 200 C22 168 50 148 72 144 L128 144 C150 148 178 168 184 200 Z" fill="#8F8A85"/>
+    <ellipse cx="44" cy="100" rx="36" ry="48" fill="#86817C"/><ellipse cx="49" cy="102" rx="24" ry="34" fill="#A09A94"/>
+    <ellipse cx="156" cy="100" rx="36" ry="48" fill="#86817C"/><ellipse cx="151" cy="102" rx="24" ry="34" fill="#A09A94"/>
+    <path d="M62 94 C60 58 80 40 100 40 C120 40 140 58 138 94 C138 116 128 130 118 138 L82 138 C72 130 62 116 62 94 Z" fill="#9A9590"/>
+    <path d="M62 94 C60 58 80 40 100 40 C120 40 140 58 138 94 C138 116 128 130 118 138 L82 138 C72 130 62 116 62 94 Z" fill="url(#SHD)"/>
+    <ellipse cx="100" cy="66" rx="22" ry="11" fill="#A7A29C" opacity=".6"/>
+    <path d="M86 122 C84 150 88 178 92 202 L110 202 C113 178 116 150 114 122 Z" fill="#948F8A"/>
+    <path d="M86 122 C84 150 88 178 92 202 L110 202 C113 178 116 150 114 122 Z" fill="url(#SHD)"/>
+    <path d="M84 132 C74 144 72 158 76 168 C82 158 86 146 90 136 Z" fill="#EFE9DA"/><path d="M116 132 C126 144 128 158 124 168 C118 158 114 146 110 136 Z" fill="#EFE9DA"/>
+    <ellipse cx="81" cy="98" rx="4.2" ry="3.2" fill="#2A2220"/><circle cx="82.3" cy="96.8" r="1.1" fill="#fff" opacity=".85"/>
+    <ellipse cx="119" cy="98" rx="4.2" ry="3.2" fill="#2A2220"/><circle cx="120.3" cy="96.8" r="1.1" fill="#fff" opacity=".85"/>`,
+  VP: snakeArt({body:"#2E5E6E",mid:"#4E8A8E",mark:"#141A1E",spot:"#C8484A",head:"#5E9A8C",stripe:"#141A1E",cheek:"#141A1E",eye:"#C9B04A",horns:false,rhino:true,top:58,
+       headPath:"M56 70 C64 56 136 56 144 70 C152 84 136 108 114 122 C107 127 93 127 86 122 C64 108 48 84 56 70 Z"}),
+  JA: snakeArt({body:"#6E5A40",mid:"#8E7652",mark:"#3E3024",spot:"#B8A27A",head:"#8C7452",stripe:"#5A4632",cheek:"#3E3024",eye:"#B89A52",horns:false,top:64,
+       headPath:"M60 70 C68 58 132 58 140 70 C146 82 132 106 112 120 C106 125 94 125 88 120 C68 106 54 82 60 70 Z"}),
+});
+const HAZ_NAME={EL:{name:"Forest elephant"},VP:{name:"Rhinoceros viper"},JA:{name:"Jararaca"}};
+const ART_BG={EL:"#E4E0D6",VP:"#DCE8DE",JA:"#E1E6C8"};
 function portraitSVG(sp){ const id="shd-"+sp;
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><defs><radialGradient id="${id}" cx="38%" cy="30%" r="78%"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".38"/></radialGradient><radialGradient id="${id}b" cx="50%" cy="35%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><rect width="200" height="200" fill="${SPECIES[sp].bg}"/><rect width="200" height="200" fill="url(#${id}b)"/>${PORTRAIT_ART[sp].replace(/url\(#SHD\)/g,`url(#${id})`)}</svg>`; }
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><defs><radialGradient id="${id}" cx="38%" cy="30%" r="78%"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".38"/></radialGradient><radialGradient id="${id}b" cx="50%" cy="35%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><rect width="200" height="200" fill="${ART_BG[sp]||SPECIES[sp].bg}"/><rect width="200" height="200" fill="url(#${id}b)"/>${PORTRAIT_ART[sp].replace(/url\(#SHD\)/g,`url(#${id})`)}</svg>`; }
 const PORTRAIT_IMG = {};
-SP_KEYS.forEach(sp=>{ const im=new Image(); im.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(portraitSVG(sp)); PORTRAIT_IMG[sp]=im; });
-const portraitHTML=(sp,cls)=>`<div class="portrait ${cls||""}" role="img" aria-label="${SPECIES[sp].name} illustration">${portraitSVG(sp)}</div>`;
+[...SP_KEYS,"EL","VP","JA"].forEach(sp=>{ const im=new Image(); im.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(portraitSVG(sp)); PORTRAIT_IMG[sp]=im; });
+const portraitHTML=(sp,cls)=>`<div class="portrait ${cls||""}" role="img" aria-label="${(SPECIES[sp]||HAZ_NAME[sp]||{name:sp}).name} illustration">${portraitSVG(sp)}</div>`;
 
 /* ---------- World ---------- */
 const W=2400, H=1600;
@@ -442,7 +484,7 @@ let groups = [];
 let log = [];
 let learned = {}; SP_KEYS.forEach(k=>learned[k]=new Set());
 let scanUntil=0, scanReadyAt=0;
-const FLEE=10;
+const FLEE=27; // your dot touching the animal marker
 let fieldDay=1;
 try{ const d=JSON.parse(localStorage.getItem("transect-day")||"null"); if(d){ fieldDay=d.day||1; } }catch(e){}
 function saveDay(){ try{ localStorage.setItem("transect-day",JSON.stringify({day:fieldDay})); }catch(e){} }
@@ -469,6 +511,44 @@ SP_KEYS.forEach(sp=>{ for(let i=0;i<4;i++) groups.push(makeGroup(sp)); });
 // one chimp party close to the start so the first view has something to follow
 groups.push(makeGroup("PT",{x:1330,y:500}));
 
+/* ---------- Hazards: animals to avoid ---------- */
+const HAZ={
+  EL:{name:"Forest elephant", sci:"Loxodonta cyclotis", zones:["north"], see:150, danger:55, speed:4, n:3,
+      warn:"Forest elephant ahead. Give it plenty of space.",
+      hit:"The forest elephant mock-charged, trumpeting and flapping its ears! Elephants need at least 50 m of space. Back off early and never come between a mother and calf."},
+  VP:{name:"Rhinoceros viper", sci:"Bitis nasicornis", zones:["north"], see:60, danger:28, speed:0, n:4,
+      warn:"Rhinoceros viper on the ground! Step around it.",
+      hit:"You nearly stepped on a rhinoceros viper! Its bright pattern breaks up its outline among the leaves. Watch where you put your feet and stay on trails."},
+  JA:{name:"Jararaca", sci:"Bothrops jararaca", zones:["plot"], see:60, danger:28, speed:0, n:3,
+      warn:"Jararaca on the ground! Step around it.",
+      hit:"A jararaca struck at your boot! This pit viper is well camouflaged on the forest floor. Watch where you step and wear boots in the field."},
+};
+let hazards=[], incidents=[];
+try{ const d=JSON.parse(localStorage.getItem("transect-safety")||"null"); if(d){ incidents=Array.isArray(d.incidents)?d.incidents:[]; } }catch(e){}
+function saveSafety(){ try{ localStorage.setItem("transect-safety",JSON.stringify({incidents})); }catch(e){} }
+function makeHazard(kind){
+  const Z=HAZ[kind]; let x,y,t=0;
+  do{ x=R(40,W-40); y=R(40,H-40); t++; } while(t<500 && (!Z.zones.includes(zoneAt(x,y)) || Math.hypot(x-player.x,y-player.y)<320 || groups.some(g=>Math.hypot(g.x-x,g.y-y)<60)));
+  const a=R(0,6.28), o={id:idN++, haz:kind, x, y, vx:Math.cos(a)*Z.speed, vy:Math.sin(a)*Z.speed, cool:0};
+  return o;
+}
+function spawnHazards(){ hazards=[]; Object.keys(HAZ).forEach(k=>{ for(let i=0;i<HAZ[k].n;i++) hazards.push(makeHazard(k)); }); }
+spawnHazards();
+function hazLevel(h){ const d=Math.hypot(h.x-player.x,h.y-player.y);
+  if(d<HAZ[h.haz].see) return 2;
+  if(h.haz==="EL" && performance.now()<scanUntil && d<SCAN) return 2;
+  return 0; }
+function incident(h,now){
+  const Z=HAZ[h.haz]; h.cool=now+6000;
+  incidents.push({k:h.haz,t:Date.now()}); saveSafety();
+  const a=Math.atan2(player.y-h.y,player.x-h.x), back=Z.danger+45;
+  player.dest={x:Math.max(10,Math.min(W-10,h.x+Math.cos(a)*back)), y:Math.max(10,Math.min(H-10,h.y+Math.sin(a)*back))};
+  player.x+=Math.cos(a)*12; player.y+=Math.sin(a)*12;
+  obs=null; lastField=""; renderPane();
+  flash(); toast(`${Z.hit} (−15 points)`,7000);
+}
+function flash(){ const f=document.getElementById("dangerFlash"); if(!f) return; f.hidden=false; f.style.animation="none"; void f.offsetWidth; f.style.animation=""; setTimeout(()=>{f.hidden=true;},900); }
+
 /* ---------- Canvas ---------- */
 const cv=document.getElementById("map"), ctx=cv.getContext("2d"), wrap=document.getElementById("mapwrap");
 let cw=0,ch=0,dpr=1;
@@ -488,6 +568,8 @@ cv.addEventListener("pointerdown", e=>{
   if(obs) return;
   const r=cv.getBoundingClientRect(); const px=e.clientX-r.left, py=e.clientY-r.top;
   let wx=px-cw/2+cam.x, wy=py-ch/2+cam.y;
+  for(const h of hazards){ const L=hazLevel(h); if(!L) continue; const [sx,sy]=toScreen(h.x,h.y); if(Math.hypot(sx-px,sy-py)<32){
+      toast(`That's a ${HAZ[h.haz].name.toLowerCase()}. Don't walk towards it: keep your distance.`); return; } }
   for(const g of groups){ const L=levelOf(g); if(L>=1){ const [sx,sy]=toScreen(g.x,g.y); if(Math.hypot(sx-px,sy-py)<32){
       if(L===3){ startObs(g); return; }
       const dx=g.x-player.x, dy=g.y-player.y, d=Math.hypot(dx,dy), stop=RANGE-8;
@@ -533,6 +615,12 @@ function step(now){
     const nx=g.x+g.vx*dt, ny=g.y+g.vy*dt;
     if(SPECIES[g.sp].zones.includes(zoneAt(nx,ny)) && nx>20&&nx<W-20&&ny>20&&ny<H-20){ g.x=nx; g.y=ny; } else { g.vx*=-1; g.vy*=-1; }
   }
+  for(const h of hazards){ const Z=HAZ[h.haz], dist=Math.hypot(h.x-player.x,h.y-player.y);
+    if(!obs && !tutEls && now>h.cool && dist<Z.danger){ incident(h,now); continue; }
+    if(!Z.speed) continue;
+    if(rnd()<.008){ const a=R(0,6.28), sp=R(.5,1)*Z.speed; h.vx=Math.cos(a)*sp; h.vy=Math.sin(a)*sp; }
+    const nx=h.x+h.vx*dt, ny=h.y+h.vy*dt;
+    if(Z.zones.includes(zoneAt(nx,ny)) && nx>20&&nx<W-20&&ny>20&&ny<H-20){ h.x=nx; h.y=ny; } else { h.vx*=-1; h.vy*=-1; } }
   cam.x+= (player.x-cam.x)*Math.min(1,dt*6); cam.y+=(player.y-cam.y)*Math.min(1,dt*6);
   draw(now);
   requestAnimationFrame(step);
@@ -572,6 +660,20 @@ function draw(now){
     }
     ctx.lineWidth=1;
   }
+  // hazards
+  for(const h of hazards){ const L=hazLevel(h); if(!L) continue; const [x,y]=toScreen(h.x,h.y);
+    const key=h.haz, r=h.haz==="EL"?22:17;
+    { const [ppx,ppy]=toScreen(player.x,player.y); const near=Math.hypot(h.x-player.x,h.y-player.y)<HAZ[h.haz].danger+40;
+      ctx.setLineDash([5,5]); ctx.strokeStyle=near?"rgba(226,64,48,.95)":"rgba(226,64,48,.55)"; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(x,y,HAZ[h.haz].danger,0,7); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle="rgba(226,64,48,.10)"; ctx.beginPath(); ctx.arc(x,y,HAZ[h.haz].danger,0,7); ctx.fill(); }
+    ctx.fillStyle="rgba(0,0,0,.35)"; ctx.beginPath(); ctx.arc(x+1.5,y+2.5,r,0,7); ctx.fill();
+    ctx.save(); ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.clip();
+    ctx.fillStyle=ART_BG[key]||SPECIES.PT.bg; ctx.fillRect(x-r,y-r,r*2,r*2);
+    const im=PORTRAIT_IMG[key]; if(im&&im.complete&&im.naturalWidth) ctx.drawImage(im,x-r*1.25,y-r*1.2,r*2.5,r*2.5);
+    ctx.restore();
+    ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.strokeStyle="#E24030"; ctx.lineWidth=2.5; ctx.stroke();
+    { ctx.fillStyle="#E24030"; ctx.beginPath(); ctx.arc(x+r*.72,y-r*.72,7,0,7); ctx.fill(); ctx.fillStyle="#fff"; ctx.font="700 10px 'Source Sans 3', sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText("!",x+r*.72,y-r*.72+.5); }
+    ctx.lineWidth=1; }
   // player
   ctx.fillStyle="rgba(0,0,0,.35)"; ctx.beginPath(); ctx.arc(px+1,py+2,10,0,7); ctx.fill();
   ctx.save(); ctx.translate(px,py); ctx.rotate(player.heading);
@@ -602,9 +704,12 @@ function nearest(){ let best=null,bd=1e9; for(const g of groups){ const d=Math.h
 
 function fieldHTML(){
   if(obs) return obsHTML();
-  const inRange = groups.filter(g=>levelOf(g)===3).sort((a,b)=>Math.hypot(a.x-player.x,a.y-player.y)-Math.hypot(b.x-player.x,b.y-player.y))[0];
+  const dd=o=>Math.hypot(o.x-player.x,o.y-player.y);
+  const inRange = groups.filter(g=>levelOf(g)===3).sort((a,b)=>dd(a)-dd(b))[0];
+  const danger = hazards.filter(h=>hazLevel(h)).sort((a,b)=>(dd(a)-HAZ[a.haz].danger)-(dd(b)-HAZ[b.haz].danger))[0];
+  const warnHTML = danger ? `<div class="warn" role="alert">${portraitHTML(danger.haz,"s")}<div><b>${esc(HAZ[danger.haz].warn)}</b><br><span class="small">${Math.round(dd(danger)/5)*5} m to the ${compass(danger.x-player.x,danger.y-player.y)} · keep outside the red circle</span></div></div>` : "";
   if(inRange){ const S=SPECIES[inRange.sp];
-    return `<div class="stack">
+    return `<div class="stack">${warnHTML}
       <div><div class="eyebrow">In observation range</div><h2>${esc(S.name)} spotted</h2>
       <p class="muted">You're close enough to watch without disturbing them. Tap the animal on the map or the button below to start a focal sample, then code what it's doing.</p></div>
       ${portraitHTML(inRange.sp,"xl")}
@@ -618,9 +723,9 @@ function fieldHTML(){
   else if(L===1){ lead=`Rustling ${m} m to the ${dir}`; sub="Something is moving in the vegetation. Approach, or scan with binoculars to identify it."; }
   else { lead=`Faint calls to the ${dir}`; sub=`Roughly ${Math.round(d/50)*50} m away. Follow the trails or head ${dir} to pick up the signs.`; }
   const done=log.length;
-  return `<div class="stack">
+  return `<div class="stack">${warnHTML}
     <div style="display:flex;gap:14px;align-items:flex-start">${L===2?portraitHTML(g.sp,"m"):""}<div><div class="eyebrow">Walking transect · ${esc(ZONE_NAME[zoneAt(player.x,player.y)])}</div><h2>${lead}</h2><p class="muted" style="margin:0">${sub}</p></div></div>
-    <div class="note small"><b>How it works.</b> Signs appear inside your dashed detection ring. Get within about 40 m, but not closer than 10 m or they'll move off. Then run a focal sample: watch the individual, then code its behaviour against the ethogram. Correct codes fill in your ethogram; wrong ones are corrected and still logged.</div>
+    <div class="note small"><b>How it works.</b> Signs appear inside your dashed detection ring. Get within about 40 m, but don't walk right into them or they'll move off. Then run a focal sample: watch the individual, then code its behaviour against the ethogram. Correct codes fill in your ethogram; wrong ones are corrected and still logged. <b>Stay away from elephants and snakes</b>: never walk inside their red circles.</div>
     <div><div class="eyebrow" style="margin-bottom:8px">Study species</div><div class="prog">${SP_KEYS.map(k=>`<div class="progrow">${badge(k,"s")}<div><b>${SPECIES[k].name}</b></div></div>`).join("")}</div></div>
     <p class="muted small">${done ? `${done} observation${done>1?"s":""} in the notebook.` : "No observations logged yet."} Species from different continents share this training reserve so you can practise all four in one walk.</p>
   </div>`;
@@ -651,7 +756,8 @@ function fmtT(ms){ const s=Math.floor(ms/1000); return `${Math.floor(s/60)}:${St
 function stats(){
   let score=0, streak=0, best=0, ok=0;
   for(const e of log){ if(e.ok){ ok++; streak++; best=Math.max(best,streak); score+=10+(streak>=3?5:0); } else { streak=0; score+=2; } }
-  return {score, ok, n:log.length, acc: log.length?Math.round(ok/log.length*100):0, streak, best};
+  score=Math.max(0, score - 15*incidents.length);
+  return {score, ok, n:log.length, acc: log.length?Math.round(ok/log.length*100):0, streak, best, inc:incidents.length};
 }
 function badgeList(){
   const st=stats(), seen=new Set(log.map(e=>e.sp));
@@ -660,6 +766,7 @@ function badgeList(){
     {id:"ten", ico:"10", name:"Field regular", desc:"Log 10 observations", got: st.n>=10},
     {id:"eye", ico:"5×", name:"Sharp eye", desc:"Code 5 behaviours right in a row", got: st.best>=5},
     {id:"all", ico:"4", name:"Four-species day", desc:"Observe all four species", got: SP_KEYS.every(k=>seen.has(k))},
+    {id:"safe", ico:"✓", name:"Safe fieldworker", desc:"Log 10 observations with no safety incidents", got: st.n>=10 && st.inc===0},
   ];
   SP_KEYS.forEach(k=>list.push({id:"eth-"+k, sp:k, name:`${SPECIES[k].name} ethogram`, desc:`Confirm all ${SPECIES[k].behs.length} ${SPECIES[k].name.toLowerCase()} behaviours`, got: learned[k].size===SPECIES[k].behs.length}));
   return list;
@@ -678,7 +785,7 @@ function notesHTML(){
   const st=stats();
   return `<div class="stack">
     <div><div class="eyebrow">Field day ${fieldDay}</div><h2>Your progress</h2></div>
-    <div class="stats"><div class="stat"><b>${st.score}</b>Score</div><div class="stat"><b>${st.n?st.acc+"%":"–"}</b>Accuracy</div><div class="stat"><b>${st.best}</b>Best streak</div></div>
+    <div class="stats"><div class="stat"><b>${st.score}</b>Score</div><div class="stat"><b>${st.n?st.acc+"%":"–"}</b>Accuracy</div><div class="stat"><b>${st.best}</b>Best streak</div><div class="stat"><b>${st.inc}</b>Safety incidents</div></div>
     <div><div class="eyebrow" style="margin-bottom:6px">Badges</div>${badgesHTML()}</div>
     <div><div class="eyebrow">Ethogram coverage</div><h3 style="margin:4px 0 8px">${n} of ${TOTAL_BEHS} behaviours confirmed</h3></div>${prog}
     <div><div class="eyebrow" style="margin-bottom:4px">Observation log</div>${rows}</div>
@@ -690,8 +797,17 @@ function guideHTML(){
   return `<div class="stack"><div><div class="eyebrow">Reference</div><h2>Ethogram</h2>
     <p class="muted">An ethogram lists a species' behaviours with short operational definitions, so every observer codes the same thing the same way.</p></div>
     <div>${SP_KEYS.map(k=>{ const S=SPECIES[k]; return `<details><summary>${badge(k,"s")}<span><b>${S.name}</b> <span class="sci">${S.sci}</span></span><span class="code muted">${learned[k].size}/${S.behs.length}</span></summary>
-      ${S.behs.map(b=>`<div class="beh"><span class="code">${b.code}</span><span><b>${esc(b.name)}</b>${esc(b.def)}</span></div>`).join("")}</details>`; }).join("")}</div></div>`;
+      ${S.behs.map(b=>`<div class="beh"><span class="code">${b.code}</span><span><b>${esc(b.name)}</b>${esc(b.def)}</span></div>`).join("")}</details>`; }).join("")}</div>
+    <div><h3 class="guide-h">Field safety</h3><p class="muted small" style="margin:0 0 4px">Some animals in the reserve are dangerous. Recognise them early and keep your distance.</p>
+    ${SAFETY.map(x=>`<details><summary>${portraitHTML(x.k,"s")}<span><b>${esc(x.name)}</b> <span class="sci">${esc(x.sci)}</span></span><span class="code muted">avoid</span></summary>
+      <div class="beh"><span class="code">SIGN</span><span><b>How to recognise it</b>${esc(x.sign)}</span></div>
+      <div class="beh"><span class="code">DO</span><span><b>What to do</b>${esc(x.todo)}</span></div></details>`).join("")}</div></div>`;
 }
+const SAFETY=[
+  {k:"EL", name:"Forest elephant", sci:"Loxodonta cyclotis", sign:"Large grey shape, crashing vegetation, low rumbles. Can be seen from far away. Ears spread wide and head raised mean it's getting stressed.", todo:"Keep at least 50 m away, stay downwind, and never block its path or come between a mother and calf."},
+  {k:"VP", name:"Rhinoceros viper", sci:"Bitis nasicornis", sign:"Heavy-bodied snake with horn-like scales on its nose and a bold pattern of blue, green, black and red. It lies still on the forest floor, often near water, and is hard to spot until you're close.", todo:"Watch where you step, stay on trails and wear boots. If you see one, walk around it at a good distance."},
+  {k:"JA", name:"Jararaca", sci:"Bothrops jararaca", sign:"Brown pit viper with dark triangular markings, hard to spot on the forest floor of Brazilian forest.", todo:"Look before you step or put your hand down. Give it space and let it move away."},
+];
 
 let lastField="";
 function renderPane(){
@@ -709,7 +825,7 @@ pane.addEventListener("click",e=>{
   else if(t.classList.contains("opt") && obs && obs.stage==="choose"){ obs.choice=+t.dataset.i; obs.stage="result"; renderPane(); }
   else if(t.id==="logBtn") finishObs();
   else if(t.id==="stopObs"){ obs=null; lastField=""; renderPane(); toast("Sample stopped. Nothing was logged."); }
-  else if(t.id==="newDay"){ fieldDay++; saveDay(); groups=[]; SP_KEYS.forEach(sp=>{ for(let i=0;i<4;i++) groups.push(makeGroup(sp)); }); lastField=""; renderPane(); toast(`Field day ${fieldDay}. The animals have moved to new spots.`); }
+  else if(t.id==="newDay"){ fieldDay++; saveDay(); spawnHazards(); groups=[]; SP_KEYS.forEach(sp=>{ for(let i=0;i<4;i++) groups.push(makeGroup(sp)); }); lastField=""; renderPane(); toast(`Field day ${fieldDay}. The animals have moved to new spots.`); }
   else if(t.id==="clearLog"){ document.getElementById("clearConfirm").hidden=false; t.hidden=true; }
   else if(t.id==="clearNo"){ lastField=""; renderPane(); }
   else if(t.id==="clearYes"){ log=[]; SP_KEYS.forEach(k=>learned[k]=new Set()); save(); lastField=""; renderPane(); }
@@ -754,7 +870,8 @@ const TUT=[
   {t:"This is you", b:"The orange dot in the middle of the map is you, and the arrow shows which way you're facing. Tap anywhere on the map to walk there, or use the arrow keys.", at:()=>mapSpot(26)},
   {t:"Listen for signs", b:"The dashed ring is how far you can hear. When an animal is inside it, a pulsing ? appears where something is rustling. The Field panel also tells you which direction to head.", at:()=>mapSpot(122)},
   {t:"Use your binoculars", b:"Scanning identifies animals much further away, so you know what's there before you walk over.", at:()=>el("scanBtn")},
-  {t:"Approach carefully", b:"Once you're within about 40 m, an orange ring appears around the animal. Don't go closer than 10 m, or it will move off. Tapping an animal walks you to a safe distance automatically.", at:()=>mapSpot(80)},
+  {t:"Approach carefully", b:"Once you're within about 40 m, an orange ring appears around the animal. Don't walk right into it, or it will move off. Tapping an animal walks you to a safe distance automatically.", at:()=>mapSpot(80)},
+  {t:"Watch out for danger", b:"Elephants and venomous snakes live here too. They're marked with a red circle: never walk inside it. Snakes only show up when you're close, so keep an eye on the Field panel.", at:null},
   {t:"Run a focal sample", b:"Tap the animal, or press Begin focal sample in this panel. Watch closely: what it does appears here, line by line, while the timer runs.", at:()=>el("pane")},
   {t:"Code the behaviour", b:"When the sample ends, pick the ethogram code that matches what you saw. Unsure? The Ethogram tab lists every behaviour with its definition.", at:()=>el("tab-guide")},
   {t:"Track your progress", b:"The Notebook keeps every observation, your score, accuracy and badges. Start a new field day there to send the animals to new spots.", at:()=>el("tab-notes")},
