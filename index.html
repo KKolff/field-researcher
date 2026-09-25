@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <title>Virtual Observation</title>
+<!-- © 2026 Kayla Kolff. All rights reserved. -->
+<meta name="author" content="Kayla Kolff">
+<meta name="copyright" content="© 2026 Kayla Kolff. All rights reserved.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@600;700&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -106,6 +109,7 @@ summary::-webkit-details-marker{display:none}
 .beh b{display:block}
 .empty{padding:18px;border:1px dashed var(--line);border-radius:6px;color:var(--muted);text-align:center}
 .small{font-size:13px}
+.copy{font-size:11px;color:var(--muted);margin:6px 0 0;text-align:center}
 .warn{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:6px;background:color-mix(in srgb,var(--bad) 13%,var(--surface));border:1px solid color-mix(in srgb,var(--bad) 45%,transparent);color:var(--ink);font-size:14px}
 .warn b{color:var(--bad)}
 .danger-flash{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 6px #E24030,inset 0 0 90px rgba(226,64,48,.55);animation:dflash .9s ease-out forwards;z-index:2}
@@ -766,6 +770,7 @@ function fieldHTML(){
     <div class="note small"><b>How it works.</b> Signs appear inside your dashed detection ring. Get within about 40 m, but don't walk right into them or they'll move off. Then run a focal sample: watch the individual, then code its behaviour against the ethogram. Correct codes fill in your ethogram; wrong ones are corrected and still logged. <b>Stay away from elephants and snakes</b>: if you walk inside their red circles, you'll be sent back to camp for 5 minutes.</div>
     <div><div class="eyebrow" style="margin-bottom:8px">Study species</div><div class="prog">${SP_KEYS.map(k=>`<div class="progrow">${badge(k,"s")}<div><b>${SPECIES[k].name}</b></div></div>`).join("")}</div></div>
     <p class="muted small">${done ? `${done} observation${done>1?"s":""} in the notebook.` : "No observations logged yet."} Species from different continents share this training reserve so you can practise all four in one walk.</p>
+    <p class="copy">© 2026 Kayla Kolff. All rights reserved.</p>
   </div>`;
 }
 
@@ -839,7 +844,7 @@ function guideHTML(){
     <div><h3 class="guide-h">Field safety</h3><p class="muted small" style="margin:0 0 4px">Some animals in the reserve are dangerous. Recognise them early and keep your distance.</p>
     ${SAFETY.map(x=>`<details><summary>${portraitHTML(x.k,"s")}<span><b>${esc(x.name)}</b> <span class="sci">${esc(x.sci)}</span></span><span class="code muted">avoid</span></summary>
       <div class="beh"><span class="code">SIGN</span><span><b>How to recognise it</b>${esc(x.sign)}</span></div>
-      <div class="beh"><span class="code">DO</span><span><b>What to do</b>${esc(x.todo)}</span></div></details>`).join("")}</div></div>`;
+      <div class="beh"><span class="code">DO</span><span><b>What to do</b>${esc(x.todo)}</span></div></details>`).join("")}</div><p class="copy">© 2026 Kayla Kolff. All rights reserved.</p></div>`;
 }
 const SAFETY=[
   {k:"EL", name:"Forest elephant", sci:"Loxodonta cyclotis", sign:"Large grey shape, crashing vegetation, low rumbles. Can be seen from far away. Ears spread wide and head raised mean it's getting stressed.", todo:"Keep at least 50 m away, stay downwind, and never block its path or come between a mother and calf."},
