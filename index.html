@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>Transect: Field Notebook</title>
+<title>Virtual Observation</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@600;700&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -111,43 +111,6 @@ summary::-webkit-details-marker{display:none}
 .danger-flash{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 6px #E24030,inset 0 0 90px rgba(226,64,48,.55);animation:dflash .9s ease-out forwards;z-index:2}
 @keyframes dflash{from{opacity:1}to{opacity:0}}
 .guide-h{margin:18px 0 4px}
-.video{position:relative;width:100%;aspect-ratio:16/9;max-width:100%;border-radius:8px;overflow:hidden;background:#111;box-shadow:0 0 0 1px var(--line)}
-.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-.gpsbig{display:flex;gap:12px;align-items:center;font-size:15px}
-.gpsbig .arrow{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--tape);color:var(--tape-ink);font-size:24px;font-weight:700;flex:none}
-.codeform{display:flex;gap:8px;flex-wrap:wrap}
-.codeform input,.fld input,.fld select,.teacher-view textarea{font:inherit;font-size:15px;padding:9px 10px;border:1px solid var(--line);border-radius:5px;background:var(--surface);color:var(--ink);min-width:0}
-.codeform input{flex:1 1 140px;text-transform:uppercase;font-family:var(--mono)}
-.codeform input::placeholder{text-transform:none;font-family:var(--body)}
-[hidden]{display:none!important}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-a.btn{text-decoration:none;display:inline-block}
-.pill:not(.ok):not(.fix){background:var(--chip);color:var(--muted)}
-.teacher-view{position:fixed;inset:0;z-index:40;background:var(--ground);overflow-y:auto;padding-block:20px;padding-inline:16px}
-.tv-inner{max-width:880px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
-.tv-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
-.tv-steps{margin:0;padding-left:20px;display:grid;gap:4px;color:var(--muted)}
-.tv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px 14px}
-.fld{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:var(--muted)}
-.fld input,.fld select{font-weight:400}
-.tv-stop{border:1px solid var(--line);border-radius:8px;padding:12px 14px 14px;background:var(--surface);margin:0}
-.tv-stop legend{font-size:13px;padding:0 6px;color:var(--muted)}
-.tv-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
-.tv-row .sp{flex:1}
-.tv-actions{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:10px}
-.tv-actions h3{margin:0}
-.teacher-view textarea{width:100%;box-sizing:border-box;font-family:var(--mono);font-size:12px}
-.ok-t{color:var(--good);font-weight:600}
-.tv-actions summary{display:list-item;cursor:pointer}
-.tv-inner > .btn{align-self:flex-start}
-.qr-sheet{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
-.qr-card{background:#fff;color:#111;border:1px solid #ccc;border-radius:8px;padding:12px;text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center;break-inside:avoid}
-.qr-card svg{width:100%;max-width:170px;height:auto}
-.qr-t{font-weight:700;font-size:14px}.qr-c{font-family:var(--mono);font-size:14px}.qr-h{font-size:12px;color:#555}
-@media (max-width:820px){ .trail-mode .main{grid-template-rows:0 1fr} .trail-mode .mapwrap{visibility:hidden} }
-@media print{ body.printing-qr .app, body.printing-qr .tv-inner > :not(.tv-actions:last-child), body.printing-qr .tv-actions:last-child > :not(.qr-sheet){display:none!important}
-  body.printing-qr .teacher-view{position:static;overflow:visible;padding:0;background:#fff}
-  body.printing-qr .qr-sheet{grid-template-columns:repeat(2,1fr);gap:18px} body.printing-qr .qr-card{border:2px dashed #999;padding:18px} body.printing-qr .qr-card svg{max-width:240px} }
 .scene{width:100%;aspect-ratio:16/9;max-width:100%;border-radius:8px;overflow:hidden;box-shadow:0 0 0 1px var(--line)}
 .scene svg{display:block;width:100%;height:100%}
 .timer{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;color:var(--ink)}
@@ -185,7 +148,16 @@ a.btn{text-decoration:none;display:inline-block}
   .meta{gap:10px}
   .ov-bl{max-width:calc(100% - 180px);font-size:11px}
 }
-@media (prefers-reduced-motion:reduce){.cue,.portrait.xl,.danger-flash{animation:none}}
+.camp{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:16px;background:rgba(6,10,7,.94);color:#EEF3E8;animation:godark 1.2s ease both;overflow-y:auto}
+.camp[hidden]{display:none!important}
+@keyframes godark{from{background:rgba(6,10,7,0)}to{background:rgba(6,10,7,.94)}}
+.camp-card{max-width:420px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center;animation:in .6s .5s ease both}
+.camp-card h2{color:#fff;font-size:30px;margin:0}
+.camp-card p{color:#C9D3C6;margin:0;font-size:15px}
+.camp-card .eyebrow{color:#E07262}
+.camp-time{font-family:var(--mono);font-size:48px;font-weight:600;font-variant-numeric:tabular-nums;color:#fff;line-height:1;margin-top:6px}
+.camp-sub{font-size:13px;color:#96A596}
+@media (prefers-reduced-motion:reduce){.cue,.portrait.xl,.danger-flash,.camp,.camp-card{animation:none}}
 </style>
 </head>
 <body style="margin:0">
@@ -193,7 +165,7 @@ a.btn{text-decoration:none;display:inline-block}
 
 <div class="app">
   <header>
-    <div class="brand"><span class="tape" aria-hidden="true"></span>Transect</div>
+    <div class="brand"><span class="tape" aria-hidden="true"></span>Virtual observation</div>
     <div class="meta">
       <span>Observer <b>OBS-01</b></span>
       <span>Grid <b id="gridref">—</b></span>
@@ -216,17 +188,13 @@ a.btn{text-decoration:none;display:inline-block}
         <button class="tab" role="tab" id="tab-field" aria-selected="true">Field</button>
         <button class="tab" role="tab" id="tab-notes" aria-selected="false">Notebook <span id="logCount"></span></button>
         <button class="tab" role="tab" id="tab-guide" aria-selected="false">Ethogram</button>
-        <button class="tab" role="tab" id="tab-trail" aria-selected="false">Trail</button>
       </div>
       <div class="pane" id="pane"></div>
     </aside>
   </div>
 </div>
-<div id="teacherView" class="teacher-view" hidden tabindex="-1" role="dialog" aria-label="Field trail setup"></div>
+<div class="camp" id="camp" hidden role="alertdialog" aria-modal="true" aria-labelledby="campT"></div>
 
-<script>/*! qrcode-generator 1.4.4 · (c) 2009 Kazuhiko Arase · MIT license */
-var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],f={},c=function(t,r){o=function(t){for(var r=new Array(t),e=0;e<t;e+=1){r[e]=new Array(t);for(var n=0;n<t;n+=1)r[e][n]=null}return r}(i=4*e+17),l(0,0),l(i-7,0),l(0,i-7),s(),h(),d(t,r),e>=7&&v(t),null==a&&(a=p(e,n,u)),w(a,r)},l=function(t,r){for(var e=-1;e<=7;e+=1)if(!(t+e<=-1||i<=t+e))for(var n=-1;n<=7;n+=1)r+n<=-1||i<=r+n||(o[t+e][r+n]=0<=e&&e<=6&&(0==n||6==n)||0<=n&&n<=6&&(0==e||6==e)||2<=e&&e<=4&&2<=n&&n<=4)},h=function(){for(var t=8;t<i-8;t+=1)null==o[t][6]&&(o[t][6]=t%2==0);for(var r=8;r<i-8;r+=1)null==o[6][r]&&(o[6][r]=r%2==0)},s=function(){for(var t=B.getPatternPosition(e),r=0;r<t.length;r+=1)for(var n=0;n<t.length;n+=1){var i=t[r],a=t[n];if(null==o[i][a])for(var u=-2;u<=2;u+=1)for(var f=-2;f<=2;f+=1)o[i+u][a+f]=-2==u||2==u||-2==f||2==f||0==u&&0==f}},v=function(t){for(var r=B.getBCHTypeNumber(e),n=0;n<18;n+=1){var a=!t&&1==(r>>n&1);o[Math.floor(n/3)][n%3+i-8-3]=a}for(n=0;n<18;n+=1){a=!t&&1==(r>>n&1);o[n%3+i-8-3][Math.floor(n/3)]=a}},d=function(t,r){for(var e=n<<3|r,a=B.getBCHTypeInfo(e),u=0;u<15;u+=1){var f=!t&&1==(a>>u&1);u<6?o[u][8]=f:u<8?o[u+1][8]=f:o[i-15+u][8]=f}for(u=0;u<15;u+=1){f=!t&&1==(a>>u&1);u<8?o[8][i-u-1]=f:u<9?o[8][15-u-1+1]=f:o[8][15-u-1]=f}o[i-8][8]=!t},w=function(t,r){for(var e=-1,n=i-1,a=7,u=0,f=B.getMaskFunction(r),c=i-1;c>0;c-=2)for(6==c&&(c-=1);;){for(var g=0;g<2;g+=1)if(null==o[n][c-g]){var l=!1;u<t.length&&(l=1==(t[u]>>>a&1)),f(n,c-g)&&(l=!l),o[n][c-g]=l,-1==(a-=1)&&(u+=1,a=7)}if((n+=e)<0||i<=n){n-=e,e=-e;break}}},p=function(t,r,e){for(var n=A.getRSBlocks(t,r),o=b(),i=0;i<e.length;i+=1){var a=e[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var u=0;for(i=0;i<n.length;i+=1)u+=n[i].dataCount;if(o.getLengthInBits()>8*u)throw"code length overflow. ("+o.getLengthInBits()+">"+8*u+")";for(o.getLengthInBits()+4<=8*u&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(!1);for(;!(o.getLengthInBits()>=8*u||(o.put(236,8),o.getLengthInBits()>=8*u));)o.put(17,8);return function(t,r){for(var e=0,n=0,o=0,i=new Array(r.length),a=new Array(r.length),u=0;u<r.length;u+=1){var f=r[u].dataCount,c=r[u].totalCount-f;n=Math.max(n,f),o=Math.max(o,c),i[u]=new Array(f);for(var g=0;g<i[u].length;g+=1)i[u][g]=255&t.getBuffer()[g+e];e+=f;var l=B.getErrorCorrectPolynomial(c),h=k(i[u],l.getLength()-1).mod(l);for(a[u]=new Array(l.getLength()-1),g=0;g<a[u].length;g+=1){var s=g+h.getLength()-a[u].length;a[u][g]=s>=0?h.getAt(s):0}}var v=0;for(g=0;g<r.length;g+=1)v+=r[g].totalCount;var d=new Array(v),w=0;for(g=0;g<n;g+=1)for(u=0;u<r.length;u+=1)g<i[u].length&&(d[w]=i[u][g],w+=1);for(g=0;g<o;g+=1)for(u=0;u<r.length;u+=1)g<a[u].length&&(d[w]=a[u][g],w+=1);return d}(o,n)};f.addData=function(t,r){var e=null;switch(r=r||"Byte"){case"Numeric":e=M(t);break;case"Alphanumeric":e=x(t);break;case"Byte":e=m(t);break;case"Kanji":e=L(t);break;default:throw"mode:"+r}u.push(e),a=null},f.isDark=function(t,r){if(t<0||i<=t||r<0||i<=r)throw t+","+r;return o[t][r]},f.getModuleCount=function(){return i},f.make=function(){if(e<1){for(var t=1;t<40;t++){for(var r=A.getRSBlocks(t,n),o=b(),i=0;i<u.length;i++){var a=u[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var g=0;for(i=0;i<r.length;i++)g+=r[i].dataCount;if(o.getLengthInBits()<=8*g)break}e=t}c(!1,function(){for(var t=0,r=0,e=0;e<8;e+=1){c(!0,e);var n=B.getLostPoint(f);(0==e||t>n)&&(t=n,r=e)}return r}())},f.createTableTag=function(t,r){t=t||2;var e="";e+='<table style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: "+(r=void 0===r?4*t:r)+"px;",e+='">',e+="<tbody>";for(var n=0;n<f.getModuleCount();n+=1){e+="<tr>";for(var o=0;o<f.getModuleCount();o+=1)e+='<td style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: 0px;",e+=" width: "+t+"px;",e+=" height: "+t+"px;",e+=" background-color: ",e+=f.isDark(n,o)?"#000000":"#ffffff",e+=";",e+='"/>';e+="</tr>"}return e+="</tbody>",e+="</table>"},f.createSvgTag=function(t,r,e,n){var o={};"object"==typeof arguments[0]&&(t=(o=arguments[0]).cellSize,r=o.margin,e=o.alt,n=o.title),t=t||2,r=void 0===r?4*t:r,(e="string"==typeof e?{text:e}:e||{}).text=e.text||null,e.id=e.text?e.id||"qrcode-description":null,(n="string"==typeof n?{text:n}:n||{}).text=n.text||null,n.id=n.text?n.id||"qrcode-title":null;var i,a,u,c,g=f.getModuleCount()*t+2*r,l="";for(c="l"+t+",0 0,"+t+" -"+t+",0 0,-"+t+"z ",l+='<svg version="1.1" xmlns="http://www.w3.org/2000/svg"',l+=o.scalable?"":' width="'+g+'px" height="'+g+'px"',l+=' viewBox="0 0 '+g+" "+g+'" ',l+=' preserveAspectRatio="xMinYMin meet"',l+=n.text||e.text?' role="img" aria-labelledby="'+y([n.id,e.id].join(" ").trim())+'"':"",l+=">",l+=n.text?'<title id="'+y(n.id)+'">'+y(n.text)+"</title>":"",l+=e.text?'<description id="'+y(e.id)+'">'+y(e.text)+"</description>":"",l+='<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>',l+='<path d="',a=0;a<f.getModuleCount();a+=1)for(u=a*t+r,i=0;i<f.getModuleCount();i+=1)f.isDark(a,i)&&(l+="M"+(i*t+r)+","+u+c);return l+='" stroke="transparent" fill="black"/>',l+="</svg>"},f.createDataURL=function(t,r){t=t||2,r=void 0===r?4*t:r;var e=f.getModuleCount()*t+2*r,n=r,o=e-r;return I(e,e,function(r,e){if(n<=r&&r<o&&n<=e&&e<o){var i=Math.floor((r-n)/t),a=Math.floor((e-n)/t);return f.isDark(a,i)?0:1}return 1})},f.createImgTag=function(t,r,e){t=t||2,r=void 0===r?4*t:r;var n=f.getModuleCount()*t+2*r,o="";return o+="<img",o+=' src="',o+=f.createDataURL(t,r),o+='"',o+=' width="',o+=n,o+='"',o+=' height="',o+=n,o+='"',e&&(o+=' alt="',o+=y(e),o+='"'),o+="/>"};var y=function(t){for(var r="",e=0;e<t.length;e+=1){var n=t.charAt(e);switch(n){case"<":r+="&lt;";break;case">":r+="&gt;";break;case"&":r+="&amp;";break;case'"':r+="&quot;";break;default:r+=n}}return r};return f.createASCII=function(t,r){if((t=t||1)<2)return function(t){t=void 0===t?2:t;var r,e,n,o,i,a=1*f.getModuleCount()+2*t,u=t,c=a-t,g={"██":"█","█ ":"▀"," █":"▄","  ":" "},l={"██":"▀","█ ":"▀"," █":" ","  ":" "},h="";for(r=0;r<a;r+=2){for(n=Math.floor((r-u)/1),o=Math.floor((r+1-u)/1),e=0;e<a;e+=1)i="█",u<=e&&e<c&&u<=r&&r<c&&f.isDark(n,Math.floor((e-u)/1))&&(i=" "),u<=e&&e<c&&u<=r+1&&r+1<c&&f.isDark(o,Math.floor((e-u)/1))?i+=" ":i+="█",h+=t<1&&r+1>=c?l[i]:g[i];h+="\n"}return a%2&&t>0?h.substring(0,h.length-a-1)+Array(a+1).join("▀"):h.substring(0,h.length-1)}(r);t-=1,r=void 0===r?2*t:r;var e,n,o,i,a=f.getModuleCount()*t+2*r,u=r,c=a-r,g=Array(t+1).join("██"),l=Array(t+1).join("  "),h="",s="";for(e=0;e<a;e+=1){for(o=Math.floor((e-u)/t),s="",n=0;n<a;n+=1)i=1,u<=n&&n<c&&u<=e&&e<c&&f.isDark(o,Math.floor((n-u)/t))&&(i=0),s+=i?g:l;for(o=0;o<t;o+=1)h+=s+"\n"}return h.substring(0,h.length-1)},f.renderTo2dContext=function(t,r){r=r||2;for(var e=f.getModuleCount(),n=0;n<e;n++)for(var o=0;o<e;o++)t.fillStyle=f.isDark(n,o)?"black":"white",t.fillRect(n*r,o*r,r,r)},f};t.stringToBytes=(t.stringToBytesFuncs={default:function(t){for(var r=[],e=0;e<t.length;e+=1){var n=t.charCodeAt(e);r.push(255&n)}return r}}).default,t.createStringToBytes=function(t,r){var e=function(){for(var e=S(t),n=function(){var t=e.read();if(-1==t)throw"eof";return t},o=0,i={};;){var a=e.read();if(-1==a)break;var u=n(),f=n()<<8|n();i[String.fromCharCode(a<<8|u)]=f,o+=1}if(o!=r)throw o+" != "+r;return i}(),n="?".charCodeAt(0);return function(t){for(var r=[],o=0;o<t.length;o+=1){var i=t.charCodeAt(o);if(i<128)r.push(i);else{var a=e[t.charAt(o)];"number"==typeof a?(255&a)==a?r.push(a):(r.push(a>>>8),r.push(255&a)):r.push(n)}}return r}};var r,e,n,o,i,a=1,u=2,f=4,c=8,g={L:1,M:0,Q:3,H:2},l=0,h=1,s=2,v=3,d=4,w=5,p=6,y=7,B=(r=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],e=1335,n=7973,i=function(t){for(var r=0;0!=t;)r+=1,t>>>=1;return r},(o={}).getBCHTypeInfo=function(t){for(var r=t<<10;i(r)-i(e)>=0;)r^=e<<i(r)-i(e);return 21522^(t<<10|r)},o.getBCHTypeNumber=function(t){for(var r=t<<12;i(r)-i(n)>=0;)r^=n<<i(r)-i(n);return t<<12|r},o.getPatternPosition=function(t){return r[t-1]},o.getMaskFunction=function(t){switch(t){case l:return function(t,r){return(t+r)%2==0};case h:return function(t,r){return t%2==0};case s:return function(t,r){return r%3==0};case v:return function(t,r){return(t+r)%3==0};case d:return function(t,r){return(Math.floor(t/2)+Math.floor(r/3))%2==0};case w:return function(t,r){return t*r%2+t*r%3==0};case p:return function(t,r){return(t*r%2+t*r%3)%2==0};case y:return function(t,r){return(t*r%3+(t+r)%2)%2==0};default:throw"bad maskPattern:"+t}},o.getErrorCorrectPolynomial=function(t){for(var r=k([1],0),e=0;e<t;e+=1)r=r.multiply(k([1,C.gexp(e)],0));return r},o.getLengthInBits=function(t,r){if(1<=r&&r<10)switch(t){case a:return 10;case u:return 9;case f:case c:return 8;default:throw"mode:"+t}else if(r<27)switch(t){case a:return 12;case u:return 11;case f:return 16;case c:return 10;default:throw"mode:"+t}else{if(!(r<41))throw"type:"+r;switch(t){case a:return 14;case u:return 13;case f:return 16;case c:return 12;default:throw"mode:"+t}}},o.getLostPoint=function(t){for(var r=t.getModuleCount(),e=0,n=0;n<r;n+=1)for(var o=0;o<r;o+=1){for(var i=0,a=t.isDark(n,o),u=-1;u<=1;u+=1)if(!(n+u<0||r<=n+u))for(var f=-1;f<=1;f+=1)o+f<0||r<=o+f||0==u&&0==f||a==t.isDark(n+u,o+f)&&(i+=1);i>5&&(e+=3+i-5)}for(n=0;n<r-1;n+=1)for(o=0;o<r-1;o+=1){var c=0;t.isDark(n,o)&&(c+=1),t.isDark(n+1,o)&&(c+=1),t.isDark(n,o+1)&&(c+=1),t.isDark(n+1,o+1)&&(c+=1),0!=c&&4!=c||(e+=3)}for(n=0;n<r;n+=1)for(o=0;o<r-6;o+=1)t.isDark(n,o)&&!t.isDark(n,o+1)&&t.isDark(n,o+2)&&t.isDark(n,o+3)&&t.isDark(n,o+4)&&!t.isDark(n,o+5)&&t.isDark(n,o+6)&&(e+=40);for(o=0;o<r;o+=1)for(n=0;n<r-6;n+=1)t.isDark(n,o)&&!t.isDark(n+1,o)&&t.isDark(n+2,o)&&t.isDark(n+3,o)&&t.isDark(n+4,o)&&!t.isDark(n+5,o)&&t.isDark(n+6,o)&&(e+=40);var g=0;for(o=0;o<r;o+=1)for(n=0;n<r;n+=1)t.isDark(n,o)&&(g+=1);return e+=Math.abs(100*g/r/r-50)/5*10},o),C=function(){for(var t=new Array(256),r=new Array(256),e=0;e<8;e+=1)t[e]=1<<e;for(e=8;e<256;e+=1)t[e]=t[e-4]^t[e-5]^t[e-6]^t[e-8];for(e=0;e<255;e+=1)r[t[e]]=e;var n={glog:function(t){if(t<1)throw"glog("+t+")";return r[t]},gexp:function(r){for(;r<0;)r+=255;for(;r>=256;)r-=255;return t[r]}};return n}();function k(t,r){if(void 0===t.length)throw t.length+"/"+r;var e=function(){for(var e=0;e<t.length&&0==t[e];)e+=1;for(var n=new Array(t.length-e+r),o=0;o<t.length-e;o+=1)n[o]=t[o+e];return n}(),n={getAt:function(t){return e[t]},getLength:function(){return e.length},multiply:function(t){for(var r=new Array(n.getLength()+t.getLength()-1),e=0;e<n.getLength();e+=1)for(var o=0;o<t.getLength();o+=1)r[e+o]^=C.gexp(C.glog(n.getAt(e))+C.glog(t.getAt(o)));return k(r,0)},mod:function(t){if(n.getLength()-t.getLength()<0)return n;for(var r=C.glog(n.getAt(0))-C.glog(t.getAt(0)),e=new Array(n.getLength()),o=0;o<n.getLength();o+=1)e[o]=n.getAt(o);for(o=0;o<t.getLength();o+=1)e[o]^=C.gexp(C.glog(t.getAt(o))+r);return k(e,0).mod(t)}};return n}var A=function(){var t=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],r=function(t,r){var e={};return e.totalCount=t,e.dataCount=r,e},e={};return e.getRSBlocks=function(e,n){var o=function(r,e){switch(e){case g.L:return t[4*(r-1)+0];case g.M:return t[4*(r-1)+1];case g.Q:return t[4*(r-1)+2];case g.H:return t[4*(r-1)+3];default:return}}(e,n);if(void 0===o)throw"bad rs block @ typeNumber:"+e+"/errorCorrectionLevel:"+n;for(var i=o.length/3,a=[],u=0;u<i;u+=1)for(var f=o[3*u+0],c=o[3*u+1],l=o[3*u+2],h=0;h<f;h+=1)a.push(r(c,l));return a},e}(),b=function(){var t=[],r=0,e={getBuffer:function(){return t},getAt:function(r){var e=Math.floor(r/8);return 1==(t[e]>>>7-r%8&1)},put:function(t,r){for(var n=0;n<r;n+=1)e.putBit(1==(t>>>r-n-1&1))},getLengthInBits:function(){return r},putBit:function(e){var n=Math.floor(r/8);t.length<=n&&t.push(0),e&&(t[n]|=128>>>r%8),r+=1}};return e},M=function(t){var r=a,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+2<r.length;)t.put(o(r.substring(n,n+3)),10),n+=3;n<r.length&&(r.length-n==1?t.put(o(r.substring(n,n+1)),4):r.length-n==2&&t.put(o(r.substring(n,n+2)),7))}},o=function(t){for(var r=0,e=0;e<t.length;e+=1)r=10*r+i(t.charAt(e));return r},i=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);throw"illegal char :"+t};return n},x=function(t){var r=u,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+1<r.length;)t.put(45*o(r.charAt(n))+o(r.charAt(n+1)),11),n+=2;n<r.length&&t.put(o(r.charAt(n)),6)}},o=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);if("A"<=t&&t<="Z")return t.charCodeAt(0)-"A".charCodeAt(0)+10;switch(t){case" ":return 36;case"$":return 37;case"%":return 38;case"*":return 39;case"+":return 40;case"-":return 41;case".":return 42;case"/":return 43;case":":return 44;default:throw"illegal char :"+t}};return n},m=function(r){var e=f,n=t.stringToBytes(r),o={getMode:function(){return e},getLength:function(t){return n.length},write:function(t){for(var r=0;r<n.length;r+=1)t.put(n[r],8)}};return o},L=function(r){var e=c,n=t.stringToBytesFuncs.SJIS;if(!n)throw"sjis not supported.";!function(){var t=n("友");if(2!=t.length||38726!=(t[0]<<8|t[1]))throw"sjis not supported."}();var o=n(r),i={getMode:function(){return e},getLength:function(t){return~~(o.length/2)},write:function(t){for(var r=o,e=0;e+1<r.length;){var n=(255&r[e])<<8|255&r[e+1];if(33088<=n&&n<=40956)n-=33088;else{if(!(57408<=n&&n<=60351))throw"illegal char at "+(e+1)+"/"+n;n-=49472}n=192*(n>>>8&255)+(255&n),t.put(n,13),e+=2}if(e<r.length)throw"illegal char at "+(e+1)}};return i},D=function(){var t=[],r={writeByte:function(r){t.push(255&r)},writeShort:function(t){r.writeByte(t),r.writeByte(t>>>8)},writeBytes:function(t,e,n){e=e||0,n=n||t.length;for(var o=0;o<n;o+=1)r.writeByte(t[o+e])},writeString:function(t){for(var e=0;e<t.length;e+=1)r.writeByte(t.charCodeAt(e))},toByteArray:function(){return t},toString:function(){var r="";r+="[";for(var e=0;e<t.length;e+=1)e>0&&(r+=","),r+=t[e];return r+="]"}};return r},S=function(t){var r=t,e=0,n=0,o=0,i={read:function(){for(;o<8;){if(e>=r.length){if(0==o)return-1;throw"unexpected end of file./"+o}var t=r.charAt(e);if(e+=1,"="==t)return o=0,-1;t.match(/^\s$/)||(n=n<<6|a(t.charCodeAt(0)),o+=6)}var i=n>>>o-8&255;return o-=8,i}},a=function(t){if(65<=t&&t<=90)return t-65;if(97<=t&&t<=122)return t-97+26;if(48<=t&&t<=57)return t-48+52;if(43==t)return 62;if(47==t)return 63;throw"c:"+t};return i},I=function(t,r,e){for(var n=function(t,r){var e=t,n=r,o=new Array(t*r),i={setPixel:function(t,r,n){o[r*e+t]=n},write:function(t){t.writeString("GIF87a"),t.writeShort(e),t.writeShort(n),t.writeByte(128),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(255),t.writeByte(255),t.writeByte(255),t.writeString(","),t.writeShort(0),t.writeShort(0),t.writeShort(e),t.writeShort(n),t.writeByte(0);var r=a(2);t.writeByte(2);for(var o=0;r.length-o>255;)t.writeByte(255),t.writeBytes(r,o,255),o+=255;t.writeByte(r.length-o),t.writeBytes(r,o,r.length-o),t.writeByte(0),t.writeString(";")}},a=function(t){for(var r=1<<t,e=1+(1<<t),n=t+1,i=u(),a=0;a<r;a+=1)i.add(String.fromCharCode(a));i.add(String.fromCharCode(r)),i.add(String.fromCharCode(e));var f,c,g,l=D(),h=(f=l,c=0,g=0,{write:function(t,r){if(t>>>r!=0)throw"length over";for(;c+r>=8;)f.writeByte(255&(t<<c|g)),r-=8-c,t>>>=8-c,g=0,c=0;g|=t<<c,c+=r},flush:function(){c>0&&f.writeByte(g)}});h.write(r,n);var s=0,v=String.fromCharCode(o[s]);for(s+=1;s<o.length;){var d=String.fromCharCode(o[s]);s+=1,i.contains(v+d)?v+=d:(h.write(i.indexOf(v),n),i.size()<4095&&(i.size()==1<<n&&(n+=1),i.add(v+d)),v=d)}return h.write(i.indexOf(v),n),h.write(e,n),h.flush(),l.toByteArray()},u=function(){var t={},r=0,e={add:function(n){if(e.contains(n))throw"dup key:"+n;t[n]=r,r+=1},size:function(){return r},indexOf:function(r){return t[r]},contains:function(r){return void 0!==t[r]}};return e};return i}(t,r),o=0;o<r;o+=1)for(var i=0;i<t;i+=1)n.setPixel(i,o,e(i,o));var a=D();n.write(a);for(var u=function(){var t=0,r=0,e=0,n="",o={},i=function(t){n+=String.fromCharCode(a(63&t))},a=function(t){if(t<0);else{if(t<26)return 65+t;if(t<52)return t-26+97;if(t<62)return t-52+48;if(62==t)return 43;if(63==t)return 47}throw"n:"+t};return o.writeByte=function(n){for(t=t<<8|255&n,r+=8,e+=1;r>=6;)i(t>>>r-6),r-=6},o.flush=function(){if(r>0&&(i(t<<6-r),t=0,r=0),e%3!=0)for(var o=3-e%3,a=0;a<o;a+=1)n+="="},o.toString=function(){return n},o}(),f=a.toByteArray(),c=0;c<f.length;c+=1)u.writeByte(f[c]);return u.flush(),"data:image/gif;base64,"+u};return t}();qrcode.stringToBytesFuncs["UTF-8"]=function(t){return function(t){for(var r=[],e=0;e<t.length;e++){var n=t.charCodeAt(e);n<128?r.push(n):n<2048?r.push(192|n>>6,128|63&n):n<55296||n>=57344?r.push(224|n>>12,128|n>>6&63,128|63&n):(e++,n=65536+((1023&n)<<10|1023&t.charCodeAt(e)),r.push(240|n>>18,128|n>>12&63,128|n>>6&63,128|63&n))}return r}(t)},function(t){"function"==typeof define&&define.amd?define([],t):"object"==typeof exports&&(module.exports=t())}(function(){return qrcode});
-</script>
 <script>
 (() => {
 /* ---------- Species & ethogram ---------- */
@@ -583,12 +551,34 @@ function hazLevel(h){ const d=Math.hypot(h.x-player.x,h.y-player.y);
 function incident(h,now){
   const Z=HAZ[h.haz]; h.cool=now+6000;
   incidents.push({k:h.haz,t:Date.now()}); saveSafety();
-  const a=Math.atan2(player.y-h.y,player.x-h.x), back=Z.danger+45;
-  player.dest={x:Math.max(10,Math.min(W-10,h.x+Math.cos(a)*back)), y:Math.max(10,Math.min(H-10,h.y+Math.sin(a)*back))};
-  player.x+=Math.cos(a)*12; player.y+=Math.sin(a)*12;
-  obs=null; lastField=""; renderPane();
-  flash(); toast(`${Z.hit} (−15 points)`,7000);
+  obs=null; keys={}; player.dest=null;
+  flash(); sendToCamp(h.haz);
 }
+/* ---------- Back to camp: 5-minute time-out after a safety incident ---------- */
+const CAMP={x:1210,y:560}, CAMP_MS=5*60*1000;
+let camp=null; // {until, k}
+try{ const c=JSON.parse(localStorage.getItem("transect-camp")||"null"); if(c && c.until>Date.now() && HAZ[c.k]) camp=c; }catch(e){}
+const inCamp=()=>!!camp;
+function sendToCamp(k){
+  camp={until:Date.now()+CAMP_MS, k}; try{ localStorage.setItem("transect-camp",JSON.stringify(camp)); }catch(e){}
+  player.x=CAMP.x; player.y=CAMP.y; cam.x=CAMP.x; cam.y=CAMP.y; lastField=""; renderPane(); showCamp(); }
+function showCamp(){
+  const box=document.getElementById("camp"), Z=HAZ[camp.k];
+  box.innerHTML=`<div class="camp-card">${portraitHTML(camp.k,"m")}<div class="eyebrow">Safety incident · −15 points</div>
+    <h2 id="campT">Back to camp</h2><p>${esc(Z.hit)}</p>
+    <p>Your field team has brought you back to camp. You can go out again once it's safe.</p>
+    <div class="camp-time" id="campTime">${fmtT(Math.max(0,camp.until-Date.now()))}</div><div class="camp-sub" id="campSub">until it's safe to head back out</div>
+    <button class="btn" id="campGo" hidden>Head back out</button></div>`;
+  box.hidden=false; document.querySelector(".app").inert=true;
+  document.getElementById("campGo").addEventListener("click",leaveCamp);
+  box.tabIndex=-1; box.focus(); tickCamp(); }
+function tickCamp(){ if(!camp) return; const left=camp.until-Date.now(), t=document.getElementById("campTime"); if(!t) return;
+  if(left>0){ t.textContent=fmtT(left+999); return; }
+  t.textContent="0:00"; const sub=document.getElementById("campSub"), go=document.getElementById("campGo");
+  if(go.hidden){ sub.textContent="It's safe now."; go.hidden=false; go.focus(); } }
+function leaveCamp(){ camp=null; try{ localStorage.removeItem("transect-camp"); }catch(e){}
+  const box=document.getElementById("camp"); box.hidden=true; box.innerHTML=""; document.querySelector(".app").inert=false;
+  player.x=CAMP.x; player.y=CAMP.y; lastField=""; renderPane(); toast("Back in the field. Keep outside the red circles this time.",4000); }
 function flash(){ const f=document.getElementById("dangerFlash"); if(!f) return; f.hidden=false; f.style.animation="none"; void f.offsetWidth; f.style.animation=""; setTimeout(()=>{f.hidden=true;},900); }
 
 /* ---------- Canvas ---------- */
@@ -607,7 +597,7 @@ function levelOf(g){ const d=Math.hypot(g.x-player.x,g.y-player.y);
 
 function toScreen(x,y){ return [x-cam.x+cw/2, y-cam.y+ch/2]; }
 cv.addEventListener("pointerdown", e=>{
-  if(obs) return;
+  if(obs||inCamp()) return;
   const r=cv.getBoundingClientRect(); const px=e.clientX-r.left, py=e.clientY-r.top;
   let wx=px-cw/2+cam.x, wy=py-ch/2+cam.y;
   for(const h of hazards){ const L=hazLevel(h); if(!L) continue; const [sx,sy]=toScreen(h.x,h.y); if(Math.hypot(sx-px,sy-py)<32){
@@ -618,7 +608,7 @@ cv.addEventListener("pointerdown", e=>{
       wx=d>stop? g.x-dx/d*stop : player.x; wy=d>stop? g.y-dy/d*stop : player.y; break; } } }
   player.dest={x:Math.max(10,Math.min(W-10,wx)), y:Math.max(10,Math.min(H-10,wy))};
 });
-addEventListener("keydown",e=>{ if(tutEls||tOpen||(e.target.closest&&e.target.closest("input,textarea,select"))) return; const k=e.key.toLowerCase(); if(["arrowup","arrowdown","arrowleft","arrowright","w","a","s","d"].includes(k)){ if(e.target.tagName!=="INPUT"){ keys[k]=true; e.preventDefault(); } } });
+addEventListener("keydown",e=>{ if(tutEls||inCamp()) return; const k=e.key.toLowerCase(); if(["arrowup","arrowdown","arrowleft","arrowright","w","a","s","d"].includes(k)){ if(e.target.tagName!=="INPUT"){ keys[k]=true; e.preventDefault(); } } });
 addEventListener("keyup",e=>{ keys[e.key.toLowerCase()]=false; });
 
 document.getElementById("scanBtn").addEventListener("click",()=>{
@@ -633,7 +623,7 @@ let last=performance.now();
 function step(now){
   const dt=Math.min(.05,(now-last)/1000); last=now;
   // player movement
-  if(!obs){
+  if(!obs && !inCamp()){
     let mx=(keys.arrowright||keys.d?1:0)-(keys.arrowleft||keys.a?1:0), my=(keys.arrowdown||keys.s?1:0)-(keys.arrowup||keys.w?1:0);
     if(mx||my){ player.dest=null; }
     else if(player.dest){ const dx=player.dest.x-player.x, dy=player.dest.y-player.y, d=Math.hypot(dx,dy);
@@ -658,7 +648,7 @@ function step(now){
     if(SPECIES[g.sp].zones.includes(zoneAt(nx,ny)) && nx>20&&nx<W-20&&ny>20&&ny<H-20){ g.x=nx; g.y=ny; } else { g.vx*=-1; g.vy*=-1; }
   }
   for(const h of hazards){ const Z=HAZ[h.haz], dist=Math.hypot(h.x-player.x,h.y-player.y);
-    if(!obs && !tutEls && now>h.cool && dist<Z.danger){ incident(h,now); continue; }
+    if(!obs && !tutEls && !inCamp() && now>h.cool && dist<Z.danger){ incident(h,now); continue; }
     if(!Z.speed) continue;
     if(rnd()<.008){ const a=R(0,6.28), sp=R(.5,1)*Z.speed; h.vx=Math.cos(a)*sp; h.vy=Math.sin(a)*sp; }
     const nx=h.x+h.vx*dt, ny=h.y+h.vy*dt;
@@ -684,6 +674,12 @@ function draw(now){
   // destination flag
   if(player.dest){ const [dx,dy]=toScreen(player.dest.x,player.dest.y);
     ctx.strokeStyle="#F0663F"; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(dx-5,dy-5); ctx.lineTo(dx+5,dy+5); ctx.moveTo(dx+5,dy-5); ctx.lineTo(dx-5,dy+5); ctx.stroke(); ctx.lineWidth=1; }
+  // camp
+  { const [tx,ty]=toScreen(CAMP.x,CAMP.y); if(tx>-40&&tx<cw+40&&ty>-40&&ty<ch+40){
+    ctx.fillStyle="rgba(214,196,150,.35)"; ctx.beginPath(); ctx.ellipse(tx,ty+6,30,18,0,0,7); ctx.fill();
+    ctx.fillStyle="#E8D9B0"; ctx.beginPath(); ctx.moveTo(tx-14,ty+10); ctx.lineTo(tx,ty-12); ctx.lineTo(tx+14,ty+10); ctx.closePath(); ctx.fill();
+    ctx.fillStyle="#6B5440"; ctx.beginPath(); ctx.moveTo(tx-3,ty+10); ctx.lineTo(tx,ty+1); ctx.lineTo(tx+3,ty+10); ctx.closePath(); ctx.fill();
+    ctx.fillStyle="rgba(243,246,239,.85)"; ctx.font="600 10px 'JetBrains Mono', monospace"; ctx.textAlign="center"; ctx.textBaseline="alphabetic"; ctx.fillText("CAMP",tx,ty+24); } }
   // animals
   for(const g of groups){ const L=levelOf(g); if(!L) continue; const [x,y]=toScreen(g.x,g.y); const S=SPECIES[g.sp];
     if(L===1){ const p=4*Math.sin(now/260+g.id);
@@ -734,8 +730,8 @@ function draw(now){
 /* ---------- Panel ---------- */
 const pane=document.getElementById("pane");
 let tab="field";
-const tabs={field:"tab-field",notes:"tab-notes",guide:"tab-guide",trail:"tab-trail"};
-Object.entries(tabs).forEach(([k,id])=>document.getElementById(id).addEventListener("click",()=>{ tab=k; if(k==="trail") trailView=null; setTrailMode(); lastField=""; renderPane(); }));
+const tabs={field:"tab-field",notes:"tab-notes",guide:"tab-guide"};
+Object.entries(tabs).forEach(([k,id])=>document.getElementById(id).addEventListener("click",()=>{ tab=k; lastField=""; renderPane(); }));
 
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 function compass(dx,dy){ const a=(Math.atan2(dx,-dy)*180/Math.PI+360)%360; return ["N","NE","E","SE","S","SW","W","NW"][Math.round(a/45)%8]; }
@@ -767,7 +763,7 @@ function fieldHTML(){
   const done=log.length;
   return `<div class="stack">${warnHTML}
     <div style="display:flex;gap:14px;align-items:flex-start">${L===2?portraitHTML(g.sp,"m"):""}<div><div class="eyebrow">Walking transect · ${esc(ZONE_NAME[zoneAt(player.x,player.y)])}</div><h2>${lead}</h2><p class="muted" style="margin:0">${sub}</p></div></div>
-    <div class="note small"><b>How it works.</b> Signs appear inside your dashed detection ring. Get within about 40 m, but don't walk right into them or they'll move off. Then run a focal sample: watch the individual, then code its behaviour against the ethogram. Correct codes fill in your ethogram; wrong ones are corrected and still logged. <b>Stay away from elephants and snakes</b>: never walk inside their red circles.</div>
+    <div class="note small"><b>How it works.</b> Signs appear inside your dashed detection ring. Get within about 40 m, but don't walk right into them or they'll move off. Then run a focal sample: watch the individual, then code its behaviour against the ethogram. Correct codes fill in your ethogram; wrong ones are corrected and still logged. <b>Stay away from elephants and snakes</b>: if you walk inside their red circles, you'll be sent back to camp for 5 minutes.</div>
     <div><div class="eyebrow" style="margin-bottom:8px">Study species</div><div class="prog">${SP_KEYS.map(k=>`<div class="progrow">${badge(k,"s")}<div><b>${SPECIES[k].name}</b></div></div>`).join("")}</div></div>
     <p class="muted small">${done ? `${done} observation${done>1?"s":""} in the notebook.` : "No observations logged yet."} Species from different continents share this training reserve so you can practise all four in one walk.</p>
   </div>`;
@@ -857,20 +853,15 @@ function renderPane(){
   document.getElementById("logCount").textContent = log.length?`(${log.length})`:"";
   document.getElementById("ethoCount").textContent = `${Object.values(learned).reduce((a,s)=>a+s.size,0)} / ${TOTAL_BEHS}`;
   document.getElementById("scoreVal").textContent = stats().score;
-  const html = tab==="field"?fieldHTML():tab==="notes"?notesHTML():tab==="trail"?trailHTML():guideHTML();
+  const html = tab==="field"?fieldHTML():tab==="notes"?notesHTML():guideHTML();
   if(html!==lastField){ pane.innerHTML=html; lastField=html; }
 }
 
-pane.addEventListener("submit",e=>{ if(e.target.id==="codeForm"){ e.preventDefault(); const v=document.getElementById("stopCode").value; if(v.trim()) openStopByCode(v); } });
 pane.addEventListener("click",e=>{
   const t=e.target.closest("button"); if(!t) return;
   if(t.id==="startObs"){ const g=groups.find(x=>x.id===+t.dataset.id); if(g) startObs(g); }
   else if(t.classList.contains("opt") && obs && obs.stage==="choose"){ obs.choice=+t.dataset.i; obs.stage="result"; renderPane(); }
   else if(t.id==="logBtn") finishObs();
-  else if(t.dataset.t!==undefined && trailView && (trailView.choice===null||trailView.choice===undefined)){ trailView.choice=+t.dataset.t; lastField=""; renderPane(); }
-  else if(t.id==="trailLog") logTrailStop();
-  else if(t.id==="trailBack"){ trailView=null; lastField=""; renderPane(); }
-  else if(t.id==="gpsStart") startGps();
   else if(t.id==="stopObs"){ obs=null; lastField=""; renderPane(); toast("Sample stopped. Nothing was logged."); }
   else if(t.id==="newDay"){ fieldDay++; saveDay(); spawnHazards(); groups=[]; SP_KEYS.forEach(sp=>{ for(let i=0;i<4;i++) groups.push(makeGroup(sp)); }); lastField=""; renderPane(); toast(`Field day ${fieldDay}. The animals have moved to new spots.`); }
   else if(t.id==="clearLog"){ document.getElementById("clearConfirm").hidden=false; t.hidden=true; }
@@ -909,228 +900,7 @@ function finishObs(){
 
 setInterval(()=>{ document.getElementById("gridref").textContent=gridRef(player.x,player.y);
   document.getElementById("zoneLabel").textContent=ZONE_NAME[zoneAt(player.x,player.y)];
-  updateScanBtn(); if(tab==="field" && !obs) renderPane(); },300);
-
-/* ---------- Field trail: GPS stops + QR codes + videos ---------- */
-const CODE_CHARS="ABCDEFGHJKMNPQRSTUVWXYZ23456789";
-function newCode(){ let c=""; for(let i=0;i<4;i++) c+=CODE_CHARS[Math.floor(Math.random()*CODE_CHARS.length)]; return c; }
-function ytId(u){ if(!u) return ""; u=String(u).trim();
-  const m=u.match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/|v\/))([A-Za-z0-9_-]{11})/);
-  if(m) return m[1]; if(/^[A-Za-z0-9_-]{11}$/.test(u)) return u; return ""; }
-function cleanTrail(t){
-  if(!t||!Array.isArray(t.stops)) return null;
-  const stops=t.stops.map(s=>({code:String(s.code||"").toUpperCase(), name:String(s.name||"Stop"), hint:String(s.hint||""),
-    lat:+s.lat, lon:+s.lon, sp:SPECIES[s.sp]?s.sp:"PT", beh:String(s.beh||""), video:String(s.video||"")}))
-    .filter(s=>s.code && SPECIES[s.sp].behs.some(b=>b.code===s.beh));
-  return stops.length?{name:String(t.name||"Field trail"), stops}:null;
-}
-let trail=null, trailSrc="none", trailView=null, pendingStop=null;
-let trailDone={}; try{ trailDone=JSON.parse(localStorage.getItem("transect-trail-progress")||"{}")||{}; }catch(e){}
-function saveTrailDone(){ try{ localStorage.setItem("transect-trail-progress",JSON.stringify(trailDone)); }catch(e){} }
-async function loadTrail(){
-  let draft=null;
-  try{ if(localStorage.getItem("transect-trail-preview")==="on") draft=cleanTrail(JSON.parse(localStorage.getItem("transect-trail-draft")||"null")); }catch(e){}
-  if(draft){ trail=draft; trailSrc="preview"; }
-  else { trail=null; trailSrc="none";
-    try{ const r=await fetch("trail.json",{cache:"no-store"}); if(r.ok){ const j=cleanTrail(await r.json()); if(j){ trail=j; trailSrc="file"; } } }catch(e){} }
-  if(pendingStop) openStopByCode(pendingStop);
-  if(tab==="trail"){ lastField=""; renderPane(); }
-}
-// --- GPS guidance ---
-let geo=null, geoWatch=null, geoMsg="";
-function startGps(){
-  if(!("geolocation" in navigator)){ geoMsg="This device can't share its location."; lastField=""; renderPane(); return; }
-  geoMsg="Looking for a GPS signal…"; lastField=""; renderPane();
-  try{ geoWatch=navigator.geolocation.watchPosition(p=>{ geo={lat:p.coords.latitude, lon:p.coords.longitude, acc:p.coords.accuracy}; geoMsg="";
-      if(tab==="trail" && !trailView) renderPane(); },
-    err=>{ geoWatch=null; geoMsg = err&&err.code===1 ? "Location access was blocked. Allow location for this site in your browser settings, then try again." : "Couldn't get a GPS signal. Move to an open spot and try again."; lastField=""; renderPane(); },
-    {enableHighAccuracy:true, maximumAge:3000, timeout:25000}); }
-  catch(e){ geoMsg="GPS isn't available here."; lastField=""; renderPane(); }
-}
-function gpsDist(a,b){ const R=6371000, t=Math.PI/180, dLa=(b.lat-a.lat)*t, dLo=(b.lon-a.lon)*t;
-  const h=Math.sin(dLa/2)**2+Math.cos(a.lat*t)*Math.cos(b.lat*t)*Math.sin(dLo/2)**2; return 2*R*Math.asin(Math.sqrt(h)); }
-function gpsBearing(a,b){ const t=Math.PI/180, y=Math.sin((b.lon-a.lon)*t)*Math.cos(b.lat*t),
-  x=Math.cos(a.lat*t)*Math.sin(b.lat*t)-Math.sin(a.lat*t)*Math.cos(b.lat*t)*Math.cos((b.lon-a.lon)*t); return (Math.atan2(y,x)/t+360)%360; }
-const DIRS=["north","north-east","east","south-east","south","south-west","west","north-west"];
-function fmtDist(m){ return m>=1000?(m/1000).toFixed(1)+" km":Math.round(m/5)*5+" m"; }
-// --- opening a stop ---
-function openStopByCode(code){
-  code=String(code||"").toUpperCase().trim();
-  if(!trail){ pendingStop=code; return; }
-  pendingStop=null;
-  const i=trail.stops.findIndex(s=>s.code===code);
-  if(i<0){ toast("That code isn't part of this trail. Check it and try again."); return; }
-  const s=trail.stops[i], S=SPECIES[s.sp], bi=S.behs.findIndex(b=>b.code===s.beh);
-  let h=0; for(const ch of s.code) h=(h*31+ch.charCodeAt(0))>>>0;
-  const others=S.behs.map((_,k)=>k).filter(k=>k!==bi).sort((a,b)=>((a*7+h)%11)-((b*7+h)%11)).slice(0,3);
-  const opts=[bi,...others].sort((a,b)=>((a*5+h)%13)-((b*5+h)%13));
-  trailView={i, bi, options:opts, choice: trailDone[s.code]?trailDone[s.code].choice:null};
-  tab="trail"; setTrailMode(); lastField=""; renderPane();
-  try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){}
-}
-function setTrailMode(){ document.querySelector(".app").classList.toggle("trail-mode", tab==="trail"); }
-function trailHTML(){
-  if(!trail) return `<div class="stack"><div><div class="eyebrow">Field trail</div><h2>No trail set up yet</h2>
-    <p class="muted">Your teacher hasn't added a field trail to this game yet. When they do, this tab will guide you to each stop with GPS, where you'll scan a QR code to watch a video and record the behaviour.</p></div>
-    <div class="note small"><b>Teachers:</b> add <code>#teacher</code> to the end of the game's link to open the trail setup.</div></div>`;
-  if(trailView) return stopHTML();
-  const stops=trail.stops, done=stops.filter(s=>trailDone[s.code]).length, next=stops.find(s=>!trailDone[s.code]);
-  const prev = trailSrc==="preview" ? `<div class="warn"><div><b>Preview mode</b><br><span class="small">You're seeing the trail from the teacher screen on this device only. Students will see the version in trail.json.</span></div></div>` : "";
-  let nextCard="";
-  if(next){
-    const ni=stops.indexOf(next);
-    let where=`<p class="muted small" style="margin:0">Turn on GPS guidance to see how far away it is.</p>`;
-    if(geo){ const d=gpsDist(geo,next), b=gpsBearing(geo,next);
-      where=`<div class="gpsbig"><span class="arrow" style="transform:rotate(${Math.round(b)}deg)" aria-hidden="true">↑</span><div><b>${fmtDist(d)}</b> to the ${DIRS[Math.round(b/45)%8]}<br><span class="muted small">GPS accuracy about ${Math.round(geo.acc)} m${d<25?" · you're there! Look for the QR code":""}</span></div></div>`; }
-    nextCard=`<div class="plate" style="grid-template-columns:auto 1fr">${portraitHTML(next.sp,"m")}<div><div class="eyebrow">Next stop · ${ni+1} of ${stops.length}</div><h3>${esc(next.name)}</h3>${next.hint?`<p class="small" style="margin:4px 0 0">${esc(next.hint)}</p>`:""}</div></div>
-      ${where}
-      <div style="display:flex;gap:8px;flex-wrap:wrap">${geoWatch===null?`<button class="btn" id="gpsStart">Start GPS guidance</button>`:""}<a class="btn ghost" href="https://www.google.com/maps/dir/?api=1&destination=${next.lat},${next.lon}&travelmode=walking" target="_blank" rel="noopener">Walking directions ↗</a></div>
-      ${geoMsg?`<p class="small" style="margin:0;color:var(--bad)">${esc(geoMsg)}</p>`:""}`;
-  } else nextCard=`<div class="note"><b>Trail complete!</b> You've visited all ${stops.length} stops. Check your results in the Notebook.</div>`;
-  return `<div class="stack">${prev}
-    <div><div class="eyebrow">Field trail · ${done} of ${stops.length} stops done</div><h2>${esc(trail.name)}</h2>
-    <p class="muted small" style="margin:0">Walk to each stop, then scan the QR code there with your phone's camera. It opens the video right here.</p></div>
-    ${nextCard}
-    <div><div class="eyebrow" style="margin-bottom:6px">Can't scan the QR code?</div>
-      <form id="codeForm" class="codeform"><label class="sr" for="stopCode">Stop code</label><input id="stopCode" autocomplete="off" autocapitalize="characters" maxlength="6" placeholder="e.g. K7PM"><button class="btn ghost" type="submit">Open stop</button></form></div>
-    <div><div class="eyebrow" style="margin-bottom:4px">All stops</div><div class="entries">${stops.map((s,k)=>{ const r=trailDone[s.code];
-      return `<div class="entry" style="grid-template-columns:30px 1fr auto;align-items:center">${portraitHTML(s.sp,"s")}<div><div class="what">${k+1}. ${esc(s.name)}</div><div class="sub">${esc(SPECIES[s.sp].name)}</div></div>
-      <span class="pill ${r?(r.ok?"ok":"fix"):""}">${r?(r.ok?"Confirmed":"Corrected"):(s===next?"Next":"To visit")}</span></div>`; }).join("")}</div></div></div>`;
-}
-function stopHTML(){
-  const s=trail.stops[trailView.i], S=SPECIES[s.sp], b=S.behs[trailView.bi], id=ytId(s.video), r=trailDone[s.code];
-  const video = id ? `<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/${id}?rel=0&playsinline=1&modestbranding=1" title="Behaviour video for ${esc(s.name)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" loading="lazy"></iframe></div>
-    <a class="small" href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener">Video not playing? Open it on YouTube ↗</a>` : `<div class="note small">This stop doesn't have a video yet. Ask your teacher.</div>`;
-  const chose=trailView.choice!==null && trailView.choice!==undefined;
-  const opts=`<div class="eyebrow">Code the behaviour you saw</div><div class="opts">${trailView.options.map(k=>{ const o=S.behs[k];
-    let cls=""; if(chose){ if(k===trailView.bi) cls="right"; else if(k===trailView.choice) cls="wrong"; }
-    return `<button class="opt ${cls}" data-t="${k}" ${chose?"disabled":""}><code>${o.code}</code><span><b>${esc(o.name)}</b><br><span class="muted small">${esc(o.def)}</span></span></button>`; }).join("")}</div>`;
-  let after="";
-  if(chose){ const ok=trailView.choice===trailView.bi;
-    after=`<p class="verdict ${ok?"good":"bad"}">${ok?`Confirmed: ${b.code}, ${esc(b.name)}.`:`Not quite. This was ${b.code}, ${esc(b.name)}.`}</p><div class="note">${esc(b.note)}</div>
-      ${r?`<button class="btn" id="trailBack">Back to the trail</button>`:`<button class="btn" id="trailLog">Log observation and continue</button>`}`; }
-  return `<div class="stack">
-    <div style="display:flex;gap:14px;align-items:center">${portraitHTML(s.sp,"m")}<div><div class="eyebrow">Stop ${trailView.i+1} of ${trail.stops.length} · ${esc(s.code)}</div><h2 style="margin-bottom:2px">${esc(s.name)}</h2><div class="sci">${esc(S.name)} · ${esc(S.sci)}</div></div></div>
-    ${video}
-    <p class="muted small" style="margin:0">Watch the whole video like a focal sample, then choose the ethogram code that matches what the ${esc(S.name.toLowerCase())} is doing.</p>
-    ${opts}${after}
-    ${chose?"":`<button class="tut-skip" id="trailBack" style="align-self:flex-start">Back to the trail</button>`}</div>`;
-}
-function logTrailStop(){
-  const s=trail.stops[trailView.i], S=SPECIES[s.sp], b=S.behs[trailView.bi], ok=trailView.choice===trailView.bi;
-  const before=new Set(badgeList().filter(x=>x.got).map(x=>x.id)), d=new Date();
-  log.push({time:`${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`, sp:s.sp, indiv:`Trail stop ${trailView.i+1}`, code:b.code, name:b.name, ok, grid:s.name, zone:"Field trail"});
-  if(ok) learned[s.sp].add(b.code); save();
-  trailDone[s.code]={ok, choice:trailView.choice}; saveTrailDone();
-  trailView=null; lastField=""; renderPane();
-  const fresh=badgeList().filter(x=>x.got && !before.has(x.id));
-  toast(fresh.length?`Badge earned: ${fresh.map(x=>x.name).join(", ")}!`:(ok?"Observation logged. Head to the next stop!":"Logged with the correct code. Head to the next stop!"),3500);
-}
-
-/* ---------- Teacher trail setup (#teacher) ---------- */
-let tDraft=null, tOpen=false;
-function loadDraft(){ try{ tDraft=JSON.parse(localStorage.getItem("transect-trail-draft")||"null"); }catch(e){}
-  if(!tDraft||!Array.isArray(tDraft.stops)) tDraft = trail&&trailSrc==="file" ? JSON.parse(JSON.stringify(trail)) : {name:"Primate field trail", stops:[]};
-  if(!tDraft.link) tDraft.link=location.origin+location.pathname; }
-function saveDraft(){ try{ localStorage.setItem("transect-trail-draft",JSON.stringify(tDraft)); }catch(e){} }
-function blankStop(){ return {code:newCode(), name:`Stop ${tDraft.stops.length+1}`, hint:"", lat:"", lon:"", sp:"PT", beh:SPECIES.PT.behs[0].code, video:""}; }
-function stopUrl(s){ return (tDraft.link||location.origin+location.pathname).replace(/#.*$/,"")+"#stop-"+s.code; }
-function qrSVG(text){ try{ const q=qrcode(0,"M"); q.addData(text); q.make(); return q.createSvgTag({cellSize:5,margin:2,scalable:true}); }catch(e){ return `<p class="small">QR code unavailable</p>`; } }
-function stopErrors(s){ const e=[];
-  if(!(s.lat!==""&&isFinite(+s.lat)&&Math.abs(+s.lat)<=90) || !(s.lon!==""&&isFinite(+s.lon)&&Math.abs(+s.lon)<=180)) e.push("add the GPS location");
-  if(!ytId(s.video)) e.push("paste a YouTube link"); return e; }
-function openTeacher(){ if(tOpen) return; loadDraft(); tOpen=true; const v=document.getElementById("teacherView"); v.hidden=false; renderTeacher(); v.focus(); }
-function closeTeacher(){ tOpen=false; document.getElementById("teacherView").hidden=true; try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){} }
-function renderTeacher(){
-  const v=document.getElementById("teacherView"), d=tDraft, ready=d.stops.length && d.stops.every(s=>!stopErrors(s).length);
-  const spOpts=k=>SP_KEYS.map(x=>`<option value="${x}" ${x===k?"selected":""}>${esc(SPECIES[x].name)}</option>`).join("");
-  const bOpts=(sp,c)=>SPECIES[sp].behs.map(b=>`<option value="${b.code}" ${b.code===c?"selected":""}>${b.code} · ${esc(b.name)}</option>`).join("");
-  v.innerHTML=`<div class="tv-inner">
-    <div class="tv-head"><div><div class="eyebrow">Teacher only</div><h2 style="margin:2px 0 0">Field trail setup</h2></div><button class="btn ghost" data-a="close">Close</button></div>
-    <ol class="tv-steps small">
-      <li>Add a stop for each place on your route. Stand at the spot and tap <b>Use my location</b>, or type the coordinates.</li>
-      <li>Choose the species and the behaviour the video shows (that's the correct answer), and paste the YouTube link.</li>
-      <li>Tap <b>Download trail.json</b> and upload it to your GitHub repository next to <code>index.html</code>.</li>
-      <li>Print the QR codes and put each one up at its stop.</li></ol>
-    <div class="tv-grid"><label class="fld">Trail name<input data-f="name" value="${esc(d.name)}"></label>
-      <label class="fld">Game link (the QR codes open this)<input data-f="link" value="${esc(d.link)}"></label></div>
-    ${d.stops.map((s,i)=>{ const err=stopErrors(s), id=ytId(s.video); return `<fieldset class="tv-stop"><legend>Stop ${i+1} · code <b>${esc(s.code)}</b></legend>
-      <div class="tv-grid">
-        <label class="fld">Stop name<input data-s="${i}" data-k="name" value="${esc(s.name)}"></label>
-        <label class="fld">Clue for students (optional)<input data-s="${i}" data-k="hint" value="${esc(s.hint)}" placeholder="e.g. Behind the big oak by the pond"></label>
-        <label class="fld">Latitude<input data-s="${i}" data-k="lat" inputmode="decimal" value="${esc(s.lat)}" placeholder="52.37021"></label>
-        <label class="fld">Longitude<input data-s="${i}" data-k="lon" inputmode="decimal" value="${esc(s.lon)}" placeholder="4.89517"></label>
-        <label class="fld">Species<select data-s="${i}" data-k="sp">${spOpts(s.sp)}</select></label>
-        <label class="fld">Behaviour in the video (correct answer)<select data-s="${i}" data-k="beh">${bOpts(s.sp,s.beh)}</select></label>
-        <label class="fld" style="grid-column:1/-1">YouTube link<input data-s="${i}" data-k="video" value="${esc(s.video)}" placeholder="https://youtu.be/…"><span class="small ${id?"ok-t":"muted"}">${id?"✓ Video found":"Paste a youtube.com or youtu.be link (unlisted videos work)."}</span></label>
-      </div>
-      <div class="tv-row"><button class="btn ghost" data-a="here" data-i="${i}">Use my location</button>
-        <button class="btn ghost" data-a="up" data-i="${i}" ${i===0?"disabled":""}>Move up</button><button class="btn ghost" data-a="down" data-i="${i}" ${i===d.stops.length-1?"disabled":""}>Move down</button>
-        <span class="sp"></span><button class="btn ghost" data-a="del" data-i="${i}">Remove stop</button></div>
-      ${err.length?`<p class="small" style="margin:6px 0 0;color:var(--bad)">To finish this stop: ${err.join(" and ")}.</p>`:""}
-      <div id="confirmDel${i}" hidden class="tv-row small">Remove stop ${i+1}? <button class="btn" data-a="delyes" data-i="${i}">Remove</button><button class="btn ghost" data-a="delno">Keep it</button></div>
-    </fieldset>`; }).join("")}
-    <button class="btn" data-a="add">+ Add a stop</button>
-    <div class="tv-actions">
-      <h3>Publish your trail</h3>
-      ${ready?"":`<p class="small muted" style="margin:0">Finish every stop to download the trail file.</p>`}
-      <div class="tv-row"><button class="btn" data-a="dl" ${ready?"":"disabled"}>Download trail.json</button>
-        <button class="btn ghost" data-a="preview" ${ready?"":"disabled"}>Try it on this device</button>
-        ${localStorage.getItem("transect-trail-preview")==="on"?`<button class="btn ghost" data-a="unpreview">Stop preview</button>`:""}
-        <label class="btn ghost" style="cursor:pointer">Open a trail.json<input type="file" id="trailFile" accept=".json,application/json" hidden></label>
-        <button class="btn ghost" data-a="print" ${d.stops.length?"":"disabled"}>Print QR codes</button></div>
-      <details><summary class="small">Download not working? Copy the file text instead</summary>
-        <p class="small muted">Create a new file called <code>trail.json</code> in your GitHub repository and paste this in.</p>
-        <textarea id="trailText" readonly rows="6">${esc(JSON.stringify({name:d.name,stops:d.stops},null,1))}</textarea>
-        <button class="btn ghost" data-a="copy">Copy text</button></details>
-    </div>
-    <div class="tv-actions"><h3>QR codes</h3><p class="small muted" style="margin:0">Make sure the game link above is your live GitHub link before you print.</p>
-      <div class="qr-sheet" id="qrSheet">${d.stops.map((s,i)=>`<div class="qr-card"><div class="qr-t">Stop ${i+1}: ${esc(s.name)}</div>${qrSVG(stopUrl(s))}<div class="qr-c">Code: <b>${esc(s.code)}</b></div><div class="qr-h">Scan with your phone camera</div></div>`).join("")}</div></div>
-  </div>`;
-}
-function tSet(el){
-  const d=tDraft;
-  if(el.dataset.f){ d[el.dataset.f]=el.value; saveDraft(); if(el.dataset.f==="link") refreshQR(); return false; }
-  const i=+el.dataset.s, k=el.dataset.k; if(!(i>=0)||!k) return false;
-  const s=d.stops[i]; s[k]= (k==="lat"||k==="lon") ? el.value.trim() : el.value;
-  if(k==="sp"){ s.beh=SPECIES[s.sp].behs[0].code; } saveDraft();
-  return k==="sp"||k==="video"||k==="lat"||k==="lon";
-}
-function refreshQR(){ const q=document.getElementById("qrSheet"); if(q) q.innerHTML=tDraft.stops.map((s,i)=>`<div class="qr-card"><div class="qr-t">Stop ${i+1}: ${esc(s.name)}</div>${qrSVG(stopUrl(s))}<div class="qr-c">Code: <b>${esc(s.code)}</b></div><div class="qr-h">Scan with your phone camera</div></div>`).join(""); }
-function rerenderKeepFocus(){ const a=document.activeElement, sel=a&&a.dataset?(a.dataset.s!==undefined?`[data-s="${a.dataset.s}"][data-k="${a.dataset.k}"]`:(a.dataset.f?`[data-f="${a.dataset.f}"]`:null)):null;
-  const pos=a&&a.selectionStart; const sc=document.getElementById("teacherView").scrollTop; renderTeacher(); document.getElementById("teacherView").scrollTop=sc;
-  if(sel){ const n=document.querySelector("#teacherView "+sel); if(n){ n.focus(); try{ if(pos!=null) n.setSelectionRange(pos,pos); }catch(e){} } } }
-function initTeacher(){
-  const v=document.getElementById("teacherView");
-  v.addEventListener("input",e=>{ const t=e.target; if(t.matches("input[data-s],input[data-f],textarea")){ const redo=tSet(t); if(t.dataset.k==="name") refreshQR(); if(redo) rerenderKeepFocus(); } });
-  v.addEventListener("change",e=>{ const t=e.target;
-    if(t.matches("select[data-s]")){ tSet(t); rerenderKeepFocus(); }
-    if(t.id==="trailFile" && t.files[0]){ t.files[0].text().then(txt=>{ const j=cleanTrail(JSON.parse(txt)); if(!j) throw 0; tDraft={...j, link:tDraft.link}; saveDraft(); renderTeacher(); toast("Trail loaded."); }).catch(()=>toast("That file isn't a valid trail.json.")); } });
-  v.addEventListener("click",e=>{ const b=e.target.closest("button[data-a]"); if(!b) return; const a=b.dataset.a, i=+b.dataset.i, d=tDraft;
-    if(a==="close") closeTeacher();
-    else if(a==="add"){ d.stops.push(blankStop()); saveDraft(); renderTeacher(); }
-    else if(a==="del"){ document.getElementById("confirmDel"+i).hidden=false; }
-    else if(a==="delno"){ renderTeacher(); }
-    else if(a==="delyes"){ d.stops.splice(i,1); saveDraft(); renderTeacher(); }
-    else if(a==="up"&&i>0){ [d.stops[i-1],d.stops[i]]=[d.stops[i],d.stops[i-1]]; saveDraft(); renderTeacher(); }
-    else if(a==="down"&&i<d.stops.length-1){ [d.stops[i+1],d.stops[i]]=[d.stops[i],d.stops[i+1]]; saveDraft(); renderTeacher(); }
-    else if(a==="here"){ if(!("geolocation" in navigator)){ toast("This device can't share its location."); return; }
-      b.textContent="Finding you…"; b.disabled=true;
-      navigator.geolocation.getCurrentPosition(p=>{ d.stops[i].lat=p.coords.latitude.toFixed(6); d.stops[i].lon=p.coords.longitude.toFixed(6); saveDraft(); renderTeacher(); toast(`Location saved (accurate to about ${Math.round(p.coords.accuracy)} m).`); },
-        err=>{ renderTeacher(); toast(err&&err.code===1?"Location access is blocked. Allow it for this site, or type the coordinates.":"Couldn't get your location. Try again outside, or type the coordinates.",5000); },
-        {enableHighAccuracy:true, timeout:20000, maximumAge:0}); }
-    else if(a==="dl"){ const blob=new Blob([JSON.stringify({name:d.name,stops:d.stops},null,1)],{type:"application/json"}); const u=URL.createObjectURL(blob);
-      const l=document.createElement("a"); l.href=u; l.download="trail.json"; document.body.appendChild(l); l.click(); l.remove(); setTimeout(()=>URL.revokeObjectURL(u),2000); toast("trail.json downloaded. Upload it to GitHub next to index.html."); }
-    else if(a==="copy"){ const ta=document.getElementById("trailText"); navigator.clipboard.writeText(ta.value).then(()=>toast("Copied.")).catch(()=>{ ta.select(); toast("Select all and copy the text."); }); }
-    else if(a==="preview"){ try{ localStorage.setItem("transect-trail-preview","on"); }catch(e){} closeTeacher(); trailView=null; tab="trail"; setTrailMode(); loadTrail(); toast("Preview on. The Trail tab now shows your draft on this device."); }
-    else if(a==="unpreview"){ try{ localStorage.removeItem("transect-trail-preview"); }catch(e){} loadTrail(); renderTeacher(); toast("Preview off."); }
-    else if(a==="print"){ document.body.classList.add("printing-qr"); setTimeout(()=>{ try{ window.print(); }catch(e){} setTimeout(()=>document.body.classList.remove("printing-qr"),500); },50); }
-  });
-  v.addEventListener("keydown",e=>{ if(e.key==="Escape") closeTeacher(); });
-}
-function handleHash(){ const h=decodeURIComponent(location.hash.slice(1));
-  if(h==="teacher") openTeacher();
-  else if(/^stop-[A-Za-z0-9]{3,8}$/.test(h)) openStopByCode(h.slice(5)); }
+  updateScanBtn(); tickCamp(); if(tab==="field" && !obs) renderPane(); },300);
 
 /* ---------- Tutorial ---------- */
 const TUT=[
@@ -1139,10 +909,9 @@ const TUT=[
   {t:"Listen for signs", b:"The dashed ring is how far you can hear. When an animal is inside it, a pulsing ? appears where something is rustling. The Field panel also tells you which direction to head.", at:()=>mapSpot(122)},
   {t:"Use your binoculars", b:"Scanning identifies animals much further away, so you know what's there before you walk over.", at:()=>el("scanBtn")},
   {t:"Approach carefully", b:"Once you're within about 40 m, an orange ring appears around the animal. Don't walk right into it, or it will move off. Tapping an animal walks you to a safe distance automatically.", at:()=>mapSpot(80)},
-  {t:"Watch out for danger", b:"Elephants and venomous snakes live here too. They're marked with a red circle: never walk inside it. Snakes only show up when you're close, so keep an eye on the Field panel.", at:null},
+  {t:"Watch out for danger", b:"Elephants and venomous snakes live here too. They're marked with a red circle: never walk inside it, or you'll be sent back to camp and have to wait 5 minutes before going out again. Snakes only show up when you're close, so keep an eye on the Field panel.", at:null},
   {t:"Run a focal sample", b:"Tap the animal, or press Begin focal sample in this panel. Watch closely: what it does appears here, line by line, while the timer runs.", at:()=>el("pane")},
   {t:"Code the behaviour", b:"When the sample ends, pick the ethogram code that matches what you saw. Unsure? The Ethogram tab lists every behaviour with its definition.", at:()=>el("tab-guide")},
-  {t:"Field trail", b:"If your teacher has set up a trail, the Trail tab guides you to real places with GPS. At each stop, scan the QR code with your phone camera to watch a video and code the behaviour you see.", at:()=>el("tab-trail")},
   {t:"Track your progress", b:"The Notebook keeps every observation, your score, accuracy and badges. Start a new field day there to send the animals to new spots.", at:()=>el("tab-notes")},
 ];
 let tutI=-1, tutEls=null;
@@ -1195,11 +964,8 @@ let tutSeen=false; try{ tutSeen=localStorage.getItem("transect-tutorial")==="don
 
 renderPane();
 requestAnimationFrame(step);
-initTeacher();
-addEventListener("hashchange",handleHash);
-const arrivedByLink=/^#(stop-|teacher)/.test(location.hash);
-loadTrail().then(handleHash);
-if(!tutSeen && !arrivedByLink) setTimeout(tutOpen,400);
+if(camp){ player.x=CAMP.x; player.y=CAMP.y; cam.x=CAMP.x; cam.y=CAMP.y; showCamp(); }
+else if(!tutSeen) setTimeout(tutOpen,400);
 })();
 </script>
 
